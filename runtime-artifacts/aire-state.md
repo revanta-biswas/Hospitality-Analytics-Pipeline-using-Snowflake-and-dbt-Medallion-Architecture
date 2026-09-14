@@ -35,8 +35,8 @@
 ## Tracker
 - **Type**: GITHUB
 - **Org/Repo**: revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture
-- **Parent Epic**: none (no Epic link/key provided; epic intent captured below)
-- **Epic URL**: n/a
+- **Parent Epic**: Milestone #1 — "Epic: Harden Pipeline (Security & Data Quality)"
+- **Epic URL**: https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1
 
 ## Epic Intent (no external Epic provided)
 - **Summary**: Harden the pipeline — address Atlas-identified Priority 1/2 findings: hard-coded/plaintext
@@ -46,7 +46,7 @@
 
 ## Branching
 - Base Branch: main
-- Epic Branch: epic/harden-pipeline-security-and-data-quality
+- Epic Branch: epic/harden-pipeline-security-and-data-quality (pushed to origin)
 - Epic PR: (not raised — raised manually at cycle end via pr-generator)
 
 ## Context Project
@@ -64,12 +64,30 @@
 - team_size: 2 (fixed default, never asked)
 - story_creation_mode: all-at-once (fixed default, never asked)
 
+## team_size
+- team_size: 2 (fixed default, never asked)
+- story_creation_mode: all-at-once (fixed default, never asked)
+- target_story_count: 8
+
+## Story Tracker
+
+| Story | Title | Requires | Tracker ID | Status | PR | Merged | Start | End | Recorded |
+|-------|-------|----------|------------|--------|----|--------|-------|-----|----------|
+| 1.1 | Replace inline AWS credentials with a Snowflake Storage Integration | TBD | #1 | 🟢 Ready for Development | — | — | | | 2026-09-14 08:30 |
+| 1.2 | Externalize dbt connection secrets via environment variables | TBD | #2 | 🟢 Ready for Development | — | — | | | 2026-09-14 08:30 |
+| 1.3 | Add core data integrity tests (uniqueness, not-null, referential integrity) | TBD | #3 | 🟢 Ready for Development | — | — | | | 2026-09-14 08:30 |
+| 1.4 | Add accepted-values tests for derived categorical columns | TBD | #4 | 🟢 Ready for Development | — | — | | | 2026-09-14 08:30 |
+| 1.5 | Fix fact.sql to depend on dimension snapshots via ref() | TBD | #5 | 🟢 Ready for Development | — | — | | | 2026-09-14 08:30 |
+| 1.6 | Reconcile the Bronze materialization configuration conflict | TBD | #6 | 🟢 Ready for Development | — | — | | | 2026-09-14 08:30 |
+| 1.7 | Add source freshness checks to the staging source | TBD | #7 | 🟢 Ready for Development | — | — | | | 2026-09-14 08:30 |
+| 1.8 | Add a static-validation CI workflow | TBD | #8 | 🟢 Ready for Development | — | — | | | 2026-09-14 08:30 |
+
 ## Stage Progress
 ### 🔵 PLANNING PHASE
 - [x] Workspace Detection
 - [x] Reverse Engineering (skipped — Atlas deep dive doc reused)
 - [x] Requirements Analysis (spec/plans/requirements.md — APPROVED 2026-09-14T08:11:00Z)
-- [ ] User Stories
+- [x] User Stories — COMPLETE (8 stories generated, GATE 1 approved, pushed to GitHub as issues #1-#8, linked to Milestone #1)
 - [ ] Dependency Graph
 - [ ] Workflow Planning
 - [ ] Application Design

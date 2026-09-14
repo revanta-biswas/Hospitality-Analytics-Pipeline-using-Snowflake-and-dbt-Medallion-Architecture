@@ -433,3 +433,43 @@ manifest row with an empty coverageCommand - correctly parsed cmd="" and no_test
 would have collapsed). Committing and re-running the smoke test.
 
 ---
+
+**Timestamp**: 2026-09-14T11:47:41Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: STOP CHECKPOINT - epic-level smoke test PASSED
+**Details**: Second smoke-test-epic.sh attempt (run 34839696866) PASSED cleanly on the first CI run
+after the 5 defect fixes - no self-repair needed this time. Full gate breakdown: D1-D7 all PASS
+(zero-diff, D1/D2/D4/D5/D6 report "no findings at either end" honestly qualified per V9), unitCoverage
+PASS ("no changed files - threshold vacuously satisfied"), credential resolution PASS (Sonar +
+Claude Code CLI both authenticated correctly this time), gating mechanics PASS. The script's own
+merge attempt failed only on a mechanical issue - PR #10 was left in draft state, which GitHub
+disallows merging - not a pipeline defect. Manually ran `gh pr ready 10` then `gh pr merge 10 --squash
+--delete-branch --admin`. VERIFIED via `gh pr view 10 --json state,mergedAt,isDraft`: state=MERGED,
+mergedAt=2026-09-14T11:47:41Z. Synced local epic branch (fast-forward to c42c96c) and pruned the
+deleted ci/epic-smoke-harden-pipeline remote-tracking ref. Smoke test gate is now satisfied -
+Development Handoff may proceed.
+
+---
+
+**Timestamp**: 2026-09-14T11:48:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Development Handoff presented — STOP CHECKPOINT complete
+**Details**: All PLANNING and design-stage work is done: 8 stories on GitHub (issues #1-8, Milestone
+#1), Dependency Graph (7/8 immediately startable), Workflow Planning (all design stages SKIP, rationale
+recorded), architecture.md v1.0.0 + rubrics + CI pipeline + SonarQube fully wired and smoke-tested
+green. Epic branch epic/harden-pipeline-security-and-data-quality at c42c96c. HALTING per CLAUDE.md —
+workflow will not proceed to Code Generation until the user types `dev-implement`.
+
+---
+
+## Story Selection — Story 1.1
+**Timestamp**: 2026-09-14T12:00:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "1"
+**TRACKER ITEM**: "[Story 1.1: Replace inline AWS credentials with a Snowflake Storage Integration](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline (Security & Data Quality)](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Resolved Story 1.1 (issue #1) matching stories.md. Doability Gate: requires=[] per dependency-graph.yml — doable immediately, no PR check needed. Transitioned GitHub label status:ready-for-dev -> status:in-development, assigned to revanta-biswas, posted claim comment. Verified via gh issue view: labels and assignee confirmed. Story Tracker updated: Status -> In Development, Start=2026-09-14. This is the first story claimed this epic; Parent Epic sync is a no-op for GitHub (milestones have no in-development state beyond open/closed)."
+**Context**: Story Selection + Doability Gate, dev-implement Step 2/3
+
+---

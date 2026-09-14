@@ -65,8 +65,10 @@
 - story_creation_mode: all-at-once (fixed default, never asked)
 
 ## Stage Progress
+### 🔵 PLANNING PHASE
 - [x] Workspace Detection
-- [ ] Requirements Analysis
+- [x] Reverse Engineering (skipped — Atlas deep dive doc reused)
+- [x] Requirements Analysis (spec/plans/requirements.md — APPROVED 2026-09-14T08:11:00Z)
 - [ ] User Stories
 - [ ] Dependency Graph
 - [ ] Workflow Planning

@@ -1,0 +1,467 @@
+# AIRE agentic eval pipeline — generated from the versioned template by filling the manifest slots.
+# 🔴 Do not hand-edit the fixed text. Every varying value comes from the `ci` manifest in
+#    tests/.evals/config.json (common/eval-framework.md Section 1). Regenerate rather than editing in place.
+name: "AIRE agentic eval pipeline"
+
+on:
+  pull_request:
+    branches:
+      - "${BASE_BRANCH}"
+${PR_BRANCH_FILTERS}
+  push:
+    branches:
+      - "${BASE_BRANCH}"
+  workflow_dispatch:
+
+# 🔴 Never add pull_request_target — it runs base secrets against untrusted head code.
+
+concurrency:
+  group: "aire-eval-${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  verify-and-evaluate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: "Checkout (full history for delta diffs)"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Resolve EVAL_KEY"
+        id: evalkey
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          REF_NAME: ${{ github.ref_name }}
+        run: bash tests/.evals/scripts/resolve-eval-key.sh "$HEAD_REF" "$REF_NAME"
+
+      - name: "Resolve base SHA"
+        id: basesha
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # 🔴 merge-base of the base branch's CURRENT tip and HEAD, not the base tip itself. Once
+            #    another story merges into an epic/bug/enh branch, that branch's tip is no longer an
+            #    ancestor of THIS PR's HEAD — a baseline checked out at the raw tip would contain code
+            #    this PR never touched and be missing nothing HEAD has, so D1/D2/D6's checkout-based
+            #    baseline capture can fail for reasons belonging to another story entirely (V7,
+            #    common/ci-pipeline-generation.md Section 4.0b.1). merge-base is the only ref guaranteed
+            #    to be a common ancestor in both directions — including the inverse case where this PR
+            #    itself merges the integration branch in to resolve a conflict.
+            echo "sha=$(git merge-base "${{ github.event.pull_request.base.sha }}" HEAD)" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=$(git rev-parse HEAD~1 2>/dev/null || git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── Purge inherited evidence — runs BEFORE any gate. Everything a gate needs is produced by that
+      #    gate; anything present at this path already is by definition not THIS run's (common/
+      #    ci-pipeline-generation.md Section 4.0e). Without this, a checkout that already carries the
+      #    story's own committed reports/eval-evidence/${EVAL_KEY}/ (dev-implement.md writes evidence
+      #    there as part of the story's own commit) lets a gate that fails to produce fresh output
+      #    silently publish/consume the stale local run instead — CI would DISPLAY a result it never
+      #    computed. tests/.evals/_run/ is scratch (gitignored) and must never survive from a prior run
+      #    either, local or CI. ──
+      - name: "Purge inherited evidence"
+        env:
+          EVAL_KEY: "${{ steps.evalkey.outputs.key }}"
+        run: rm -rf tests/.evals/_run "reports/eval-evidence/${EVAL_KEY}"
+
+      # ── #7a: the YAML holds NO stack facts. "Read manifest" builds the MERGED view (config.json's
+      #    ci.roots[] + every tests/.evals/ci-manifest.d/*.json fragment) fresh, every run, and exposes
+      #    one boolean + one version per stack. The five setup blocks below are ALWAYS present — nothing
+      #    is ever added or removed from this file for a new stack, only ENABLED, by a fact the manifest
+      #    already carries (common/ci-pipeline-generation.md Section 4.0d.1). This block is byte-identical
+      #    in the self-repair job below — there is no separate slot to keep in sync, because there is no
+      #    per-repo generated text here at all. ──
+      - name: "Read manifest"
+        id: readmanifest
+        run: bash tests/.evals/scripts/read-manifest.sh >> "$GITHUB_OUTPUT"
+
+      - name: "Setup Node"
+        if: steps.readmanifest.outputs.has_node == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ steps.readmanifest.outputs.node_version || '20' }}"
+
+      - name: "Setup Python"
+        if: steps.readmanifest.outputs.has_python == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "${{ steps.readmanifest.outputs.python_version || '3.12' }}"
+
+      - name: "Setup Java"
+        if: steps.readmanifest.outputs.has_java == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "${{ steps.readmanifest.outputs.java_version || '21' }}"
+
+      - name: "Setup Go"
+        if: steps.readmanifest.outputs.has_go == 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version: "${{ steps.readmanifest.outputs.go_version || '1.22' }}"
+
+      - name: "Setup .NET"
+        if: steps.readmanifest.outputs.has_dotnet == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "${{ steps.readmanifest.outputs.dotnet_version || '8.0' }}"
+
+      # ── ONE fixed step, every run: iterates the merged manifest's roots (diff-scoped per root,
+      #    Section 4.0g) for the project's own installCommands, THEN the merged, deduped eval tools from
+      #    every root's toolInstallCommands — replacing the old separately-generated "Install eval
+      #    tools" block. A tool named in .tools with no matching toolInstallCommands anywhere is a
+      #    Manifest defect, never a silent skip. ──
+      # 🔴 Sixth toolchain step, for stacks the five setup blocks above do not cover (rust, ruby, php,
+      #    scala, elixir, swift, c/c++). Keeps the template's "nothing is ever added or removed for a new
+      #    stack" invariant intact: this step is ALWAYS present and reads ci.roots[].toolchainSetup at run
+      #    time. A root with an unknown stack and no toolchainSetup is a Manifest defect raised by
+      #    read-manifest.*, never a silent no-op that leaves the build on the runner image's own version.
+      - name: "Setup other toolchains"
+        run: bash tests/.evals/scripts/ci-manifest-runner.sh toolchain "${{ steps.basesha.outputs.sha }}"
+
+      - name: "Install dependencies"
+        id: install
+        run: bash tests/.evals/scripts/ci-manifest-runner.sh install "${{ steps.basesha.outputs.sha }}"
+
+      # ── Compile/build BEFORE any evaluation or test step — static evals and unit tests on code that
+      #    doesn't build are meaningless. Diff-scoped per root, same fixed script, same reasoning as
+      #    Install dependencies above — a root with no buildCommand (e.g. plain Python) reports an
+      #    explicit N/A, never a silently omitted step (Section 4.0d.1).
+      - name: "Compile / build"
+        id: build
+        run: bash tests/.evals/scripts/ci-manifest-runner.sh build "${{ steps.basesha.outputs.sha }}"
+
+      # ── Every gate step: id + continue-on-error. NEVER `|| true`. The Verdict step decides once. ──
+      # Runs FIRST, like a normal CI pipeline (fail fast on cheap static checks before paying for the
+      # full test suite). Does NOT compute the coverage gate — the report it needs doesn't exist yet;
+      # that's the separate "Coverage gate" step below, after "Stage 2: unit + coverage" produces it.
+      - name: "Stage 1: static evals (delta-scoped)"
+        id: static
+        continue-on-error: true
+        env:
+          EVAL_KEY: "${{ steps.evalkey.outputs.key }}"
+        run: bash tests/.evals/scripts/run-static-evals.sh "${{ steps.basesha.outputs.sha }}"
+
+      - name: "Stage 2: unit + coverage"
+        id: unit
+        continue-on-error: true
+        run: bash tests/.evals/scripts/ci-manifest-runner.sh coverage "${{ steps.basesha.outputs.sha }}"
+
+      # ── Runs AFTER "unit + coverage" so the report it produced exists. A separate step (not folded
+      #    back into Stage 1) so Stage 1 keeps its normal fail-fast position instead of waiting on the
+      #    full test suite. Appends to the SAME gates file Stage 1 wrote — see run-static-evals.*. ──
+      - name: "Coverage gate (delta-scoped)"
+        id: coverage
+        continue-on-error: true
+        env:
+          EVAL_KEY: "${{ steps.evalkey.outputs.key }}"
+        run: bash tests/.evals/scripts/run-static-evals.sh "${{ steps.basesha.outputs.sha }}" --coverage-only
+
+      - name: "Stage 2: behaviour (Gherkin, Podman)"
+        id: behavior
+        continue-on-error: true
+        run: |
+          mkdir -p tests/.evals/_run
+          podman build -t "${BEHAVIOR_IMAGE_TAG}" -f tests/.evals/behavior/Containerfile .
+          if [ "${{ github.base_ref }}" = "${BASE_BRANCH}" ]; then tiers="b1 b2 b3"; else tiers="b1 b2"; fi
+          for skip in b1 b2 b3; do
+            case " $tiers " in *" $skip "*) ;; *) echo "N/A" > "tests/.evals/_run/behavior${skip^^}.status" ;; esac
+          done
+          step_fail=0
+          for t in $tiers; do
+            # 🔴 `|| trc=$?` (not a bare command + separate `trc=$?` line) — GH Actions bash steps run
+            #    with `set -e` by default, so an unguarded failing command aborts the step before the
+            #    next line ever runs. `cmd || trc=$?` captures the real exit code without tripping it.
+            # 🔴 ONE combined command string, never two separate trailing argv elements — the image's
+            #    ENTRYPOINT ["/bin/sh", "-c"] requires it (behavior/Containerfile's own comment,
+            #    common/behavior-spec.md Section 5.3). Passed as separate args, POSIX `sh -c` assigns
+            #    the tier to the invoked shell's $0, not run.sh's $1 — run.sh then always sees an empty
+            #    $1 ("no tier supplied") regardless of which tier was requested.
+            trc=0
+            # 🔴 -e AIRE_STORY_KEY: b1 must run THIS unit's contract. EVAL_KEY is already the work-unit
+            #    slug (story-1.10), which is exactly the feature-file stem. Without it run.sh cannot
+            #    identify the unit under test and (correctly) refuses to guess once an epic has more
+            #    than one feature file.
+            podman run --rm -e AIRE_STORY_KEY="${{ steps.evalkey.outputs.key }}" -v "$PWD:/work:Z" -w /work "${BEHAVIOR_IMAGE_TAG}" "bash tests/.evals/behavior/run.sh $t" || trc=$?
+            if [ "$trc" -eq 0 ]; then
+              echo "PASS" > "tests/.evals/_run/behavior${t^^}.status"
+            elif [ "$trc" -eq 3 ]; then
+              # N/A — no story has been dev-implement'd in this epic yet (run.sh's own pre-story
+              # exception, ci-pipeline-generation.md Section 4.0.6). Never a blocking failure.
+              echo "N/A" > "tests/.evals/_run/behavior${t^^}.status"
+            else
+              echo "FAIL" > "tests/.evals/_run/behavior${t^^}.status"
+              step_fail=1
+            fi
+          done
+          exit "$step_fail"
+
+      # 🔴 run-evals.sh's OWN precondition check (`command -v claude`) fails the judge gate outright if
+      #    this is missing — the self-repair job installs the CLI for ITSELF, later, only on failure;
+      #    that install never reaches this job. Without this step, J1/J2 fail on every single PR before
+      #    ever reaching a real judge call ("claude CLI not installed — judge cannot run").
+      - name: "Install Claude Code CLI"
+        run: npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
+
+      - name: "Stage 3: judge gates J1 + J2"
+        id: judge
+        continue-on-error: true
+        env:
+          EVAL_KEY: "${{ steps.evalkey.outputs.key }}"
+          CLAUDE_CODE_OAUTH_TOKEN: "${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}"
+          ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
+        run: bash tests/.evals/scripts/run-evals.sh "${{ steps.basesha.outputs.sha }}"
+
+      # SonarQube LAST among the gates, if: always(), continue-on-error — one input, never a kill switch.
+      # 🔴 SONAR SCOPE IS RESOLVED AT RUN TIME — never baked from a PLANNED code root.
+      #    Observed failure (real run, epic smoke test on a greenfield repo):
+      #      ERROR Invalid value of sonar.sources ... The folder 'src' does not exist
+      #      EXECUTION FAILURE ... Process completed with exit code 3
+      #    then the quality-gate step failed too: ".scannerwork/report-task.txt does not exist."
+      #    Section 4.1.1 writes sonar.sources from the resolved Code Root (default `src/`), but at the
+      #    STOP CHECKPOINT — which is exactly when the smoke test runs — a greenfield repo has no src/
+      #    yet. The properties file described the project AIRE intends to build, not the one on disk.
+      #    Same class as every other "written from intent, not from what exists" defect: resolve it
+      #    from the merged manifest at run time, keep only paths that actually exist, and skip Sonar
+      #    entirely (explicitly, never silently) when none do.
+      - name: "Resolve Sonar scope"
+        id: sonarscope
+        if: always()
+        run: |
+          props="sonar-project.properties"
+          if [ ! -f "$props" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::SonarQube skipped - no sonar-project.properties in this repo."
+            exit 0
+          fi
+          # Prefer the merged manifest's sourcePaths (the same truth every other gate uses); fall back
+          # to whatever the properties file already declares.
+          cands=""
+          if [ -f tests/.evals/_run/merged-manifest.json ] && command -v jq >/dev/null 2>&1; then
+            cands="$(jq -r '[.[].sourcePaths[]?] | unique[]' tests/.evals/_run/merged-manifest.json 2>/dev/null | tr -d '\r')"
+          fi
+          if [ -z "$cands" ]; then
+            cands="$(grep '^sonar.sources=' "$props" 2>/dev/null | cut -d= -f2- | tr ',' '\n' | tr -d '\r')"
+          fi
+          existing=""
+          for c in $cands; do
+            [ -n "$c" ] && [ -e "$c" ] && existing="${existing}${existing:+,}${c}"
+          done
+          if [ -z "$existing" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::SonarQube skipped - none of the configured source paths exist in this checkout yet. Normal for a greenfield repo before its first story; the scan would fail with 'folder does not exist' and take the quality gate down with it."
+            exit 0
+          fi
+          # keep sonar.tests to directories that exist too - a declared-but-absent tests dir fails the
+          # same way sources does
+          tcands="$(grep '^sonar.tests=' "$props" 2>/dev/null | cut -d= -f2- | tr ',' '\n' | tr -d '\r')"
+          texisting=""
+          for c in $tcands; do
+            [ -n "$c" ] && [ -e "$c" ] && texisting="${texisting}${texisting:+,}${c}"
+          done
+          tmp="$(mktemp)"
+          grep -v '^sonar.sources=' "$props" | grep -v '^sonar.tests=' > "$tmp"
+          echo "sonar.sources=${existing}" >> "$tmp"
+          [ -n "$texisting" ] && echo "sonar.tests=${texisting}" >> "$tmp"
+          mv "$tmp" "$props"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "Sonar scope resolved - sources: ${existing}${texisting:+ | tests: ${texisting}}"
+
+${SONAR_STEPS}
+
+      - name: "Record SonarQube gate status"
+        id: sonarstatus
+        if: always()
+        env:
+          SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
+        run: |
+          mkdir -p tests/.evals/_run
+          outcome="${{ steps.sonarqg.outcome }}"
+          if [ -z "$outcome" ]; then
+            echo "N/A" > tests/.evals/_run/sonarqube.status
+          elif [ "$outcome" = "success" ]; then
+            echo "PASS" > tests/.evals/_run/sonarqube.status
+          else
+            echo "FAIL" > tests/.evals/_run/sonarqube.status
+            # 🔴 auto-fix-agent.*'s triage (Section 6.4) reads tests/.evals/_run/sonar-conditions.txt to tell a
+            #    REAL quality-gate failure (real conditions reported) apart from a connection/auth
+            #    problem (gate never evaluated) — nothing wrote this file before, so every Sonar failure
+            #    was unconditionally misclassified as infrastructure, even a genuine coverage/bug/smell
+            #    finding. sonarqube-quality-gate-action@v1 only outputs PASS/WARN/FAILED, never the
+            #    underlying conditions — query the SonarQube Web API directly for them, using the
+            #    ceTaskUrl the scan step's own report-task.txt recorded.
+            # 🔴 EVERY substitution below carries its own `|| true`. Under GH Actions' default
+            #    `set -e -o pipefail`, a bare `VAR="$(cmd | cmd2)"` with no guard aborts this WHOLE
+            #    step the instant grep finds no match or curl hits any hiccup (auth, network, an
+            #    unexpected report-task.txt format) — and this step has no continue-on-error, so that
+            #    abort would fail the job independently of the Verdict step, violating V8 ("exactly
+            #    one Verdict step... is the ONLY step allowed to fail the job"). Reproduced and
+            #    verified locally before writing this guard — it is not decorative.
+            : > tests/.evals/_run/sonar-conditions.txt
+            REPORT_TASK=".scannerwork/report-task.txt"
+            if [ -f "$REPORT_TASK" ] && command -v jq >/dev/null 2>&1; then
+              CE_TASK_URL="$(grep '^ceTaskUrl=' "$REPORT_TASK" | cut -d= -f2-)" || true
+              if [ -n "$CE_TASK_URL" ]; then
+                ANALYSIS_ID="$(curl -sf -u "${SONAR_TOKEN}:" "$CE_TASK_URL" 2>/dev/null | jq -r '.task.analysisId // empty')" || true
+                if [ -n "$ANALYSIS_ID" ]; then
+                  SERVER_URL="$(grep '^serverUrl=' "$REPORT_TASK" | cut -d= -f2-)" || true
+                  curl -sf -u "${SONAR_TOKEN}:" "${SERVER_URL}/api/qualitygates/project_status?analysisId=${ANALYSIS_ID}" 2>/dev/null \
+                    | jq -r '.projectStatus.conditions[]? | select(.status=="ERROR") | "\(.metricKey) actual=\(.actualValue) threshold=\(.errorThreshold) comparator=\(.comparator)"' \
+                    > tests/.evals/_run/sonar-conditions.txt || true
+                fi
+              fi
+            fi
+          fi
+
+      - name: "Verdict"
+        id: verdict
+        if: always()
+        env:
+          EVAL_KEY: "${{ steps.evalkey.outputs.key }}"
+        run: |
+          mkdir -p tests/.evals/_run
+          : > tests/.evals/_run/failed-gates.txt
+          fail=0
+          for r in "static:${{ steps.static.outcome }}" \
+                   "unit:${{ steps.unit.outcome }}" \
+                   "coverage:${{ steps.coverage.outcome }}" \
+                   "behavior:${{ steps.behavior.outcome }}" \
+                   "judge:${{ steps.judge.outcome }}" \
+                   "sonar:${{ steps.sonarqg.outcome }}"; do
+            name="${r%%:*}"; outcome="${r##*:}"
+            echo "$name: $outcome"
+            if [ "$outcome" = "failure" ]; then echo "$name" >> tests/.evals/_run/failed-gates.txt; fail=1; fi
+          done
+          exit "$fail"
+
+      - name: "Stage 4: publish scorecard"
+        if: always()
+        env:
+          EVAL_KEY: "${{ steps.evalkey.outputs.key }}"
+        run: |
+          SUMMARY="reports/eval-evidence/${EVAL_KEY}/eval-summary.md"
+          if [ -f "$SUMMARY" ]; then
+            cat "$SUMMARY" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::error::No eval-summary.md at $SUMMARY — the eval step did not produce one."
+          fi
+
+      - name: "Upload eval artifacts"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: |
+            tests/.evals/_run/failed-gates.txt
+            reports/eval-evidence/
+          if-no-files-found: warn
+
+  self-repair:
+    needs: verify-and-evaluate
+    if: |
+      failure() &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: "Checkout PR head"
+        uses: actions/checkout@v4
+        with:
+          ref: "${{ github.event.pull_request.head.ref }}"
+          fetch-depth: 0
+
+      - name: "Download eval artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          name: eval-results
+
+      # ── Same EVAL_KEY resolution as the verify job — auto-fix-agent.sh resolves its evidence by this
+      #    EXACT key, never by searching reports/eval-evidence/ for the first match (V31, Section 4.0e).
+      #    Without this step, self-repair had no EVAL_KEY at all — it could only find evidence by `find`,
+      #    which after a few merged stories can silently pick up ANOTHER story's committed eval.json. ──
+      - name: "Resolve EVAL_KEY"
+        id: evalkey
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          REF_NAME: ${{ github.ref_name }}
+        run: bash tests/.evals/scripts/resolve-eval-key.sh "$HEAD_REF" "$REF_NAME"
+
+      # ── Same merge-base logic as the verify job's own "Resolve base SHA" (V7, Section 4.0b.1/11) —
+      #    self-repair re-verifies with tests/.evals/scripts/run-static-evals.sh, which must diff
+      #    against the SAME real common ancestor the verify job used, never the base branch's raw,
+      #    possibly-since-moved tip. ──
+      - name: "Resolve base SHA"
+        id: basesha
+        run: echo "sha=$(git merge-base "${{ github.event.pull_request.base.sha }}" HEAD)" >> "$GITHUB_OUTPUT"
+
+      # ── #7a: byte-identical to the verify job's own copy above — there is no separate slot to keep in
+      #    sync (Section 3.1's "same tools" rule is now structural, not a thing to remember), because
+      #    both jobs read the SAME merged manifest through the SAME fixed steps. ──
+      - name: "Read manifest"
+        id: readmanifest
+        run: bash tests/.evals/scripts/read-manifest.sh >> "$GITHUB_OUTPUT"
+
+      - name: "Setup Node"
+        if: steps.readmanifest.outputs.has_node == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ steps.readmanifest.outputs.node_version || '20' }}"
+
+      - name: "Setup Python"
+        if: steps.readmanifest.outputs.has_python == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "${{ steps.readmanifest.outputs.python_version || '3.12' }}"
+
+      - name: "Setup Java"
+        if: steps.readmanifest.outputs.has_java == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "${{ steps.readmanifest.outputs.java_version || '21' }}"
+
+      - name: "Setup Go"
+        if: steps.readmanifest.outputs.has_go == 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version: "${{ steps.readmanifest.outputs.go_version || '1.22' }}"
+
+      - name: "Setup .NET"
+        if: steps.readmanifest.outputs.has_dotnet == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "${{ steps.readmanifest.outputs.dotnet_version || '8.0' }}"
+
+      # 🔴 Sixth toolchain step, for stacks the five setup blocks above do not cover (rust, ruby, php,
+      #    scala, elixir, swift, c/c++). Keeps the template's "nothing is ever added or removed for a new
+      #    stack" invariant intact: this step is ALWAYS present and reads ci.roots[].toolchainSetup at run
+      #    time. A root with an unknown stack and no toolchainSetup is a Manifest defect raised by
+      #    read-manifest.*, never a silent no-op that leaves the build on the runner image's own version.
+      - name: "Setup other toolchains"
+        run: bash tests/.evals/scripts/ci-manifest-runner.sh toolchain "${{ steps.basesha.outputs.sha }}"
+
+      - name: "Install dependencies"
+        id: install
+        run: bash tests/.evals/scripts/ci-manifest-runner.sh install "${{ steps.basesha.outputs.sha }}"
+
+      - name: "Compile / build"
+        id: build
+        run: bash tests/.evals/scripts/ci-manifest-runner.sh build "${{ steps.basesha.outputs.sha }}"
+
+      - name: "Install Claude Code CLI"
+        run: npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
+
+      - name: "Autonomous self-repair"
+        env:
+          # 🔴 Emit ONLY the credential the repo actually configured. An unset secret expands to an
+          #    empty string, and an empty credential fails auth instead of falling through.
+          CLAUDE_CODE_OAUTH_TOKEN: "${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}"
+          BASE_SHA: "${{ steps.basesha.outputs.sha }}"
+          EVAL_KEY: "${{ steps.evalkey.outputs.key }}"
+        run: bash tests/.evals/scripts/auto-fix-agent.sh

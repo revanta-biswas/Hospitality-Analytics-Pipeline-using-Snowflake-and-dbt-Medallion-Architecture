@@ -1,0 +1,26 @@
+# Behaviour test image — built and run by Podman locally and in CI (identical image, Section 4.1b).
+# ${BEHAVIOR_BASE_IMAGE} is the only slot: the generator sets it to the stack's runtime base image
+# (e.g. docker.io/library/python:3.12-slim, docker.io/library/node:20-slim, maven:3.9-eclipse-temurin).
+FROM ${BEHAVIOR_BASE_IMAGE}
+
+WORKDIR /work
+
+# The generator appends the stack's Gherkin runner install between the markers (Section 3):
+#   Python  : pip install pytest-bdd
+#   JS/TS   : npm i -g @cucumber/cucumber
+#   Java    : (bundled via mvn verify -Dcucumber)
+# >>> STACK-RESOLVED BEHAVIOUR DEPS START <<<
+# >>> STACK-RESOLVED BEHAVIOUR DEPS END <<<
+
+# run.sh is bind-mounted with the repo at runtime; nothing to COPY.
+#
+# 🔴 ENTRYPOINT ["/bin/sh", "-c"] REQUIRES a SINGLE combined command string as the CMD — never two
+#    separate argv elements. `podman run ... IMAGE "bash tests/.evals/behavior/run.sh <tier>"` (one quoted
+#    string) works: sh -c parses and word-splits that whole string itself, so run.sh gets $1=<tier>
+#    correctly. `podman run ... IMAGE tests/.evals/behavior/run.sh "<tier>"` (two separate args) is BROKEN:
+#    per POSIX `sh -c` semantics, any arg AFTER the command string is assigned starting at the
+#    invoked shell's $0, not forwarded as $1 to whatever the command string names — so <tier> is
+#    silently swallowed and run.sh always sees an empty $1 ("run.sh: no tier supplied"), regardless
+#    of which tier was requested. Every caller of this image (common/behavior-spec.md Section 5.3,
+#    the generated CI workflow) MUST use the single-combined-string form.
+ENTRYPOINT ["/bin/sh", "-c"]

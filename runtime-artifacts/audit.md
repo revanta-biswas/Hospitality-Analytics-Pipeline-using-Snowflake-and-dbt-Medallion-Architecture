@@ -280,3 +280,24 @@ occurrence — the first time, prior to this instruction, it was restored; this 
 instruction, the deletion is treated as intentional and committed rather than restored).
 
 ---
+
+**Timestamp**: 2026-09-14T08:33:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Dependency Graph — start
+**Details**: Reused team_size=2 from aire-state.md (not re-asked). Applying TRUE-PARALLELISM RULES to
+the 8 approved stories.
+
+---
+
+**Timestamp**: 2026-09-14T08:34:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Dependency Graph — generated and auto-approved (no gate)
+**Details**: Wrote spec/plans/dependency-graph.yml. Inferred edges: Stories 1.1-1.7 have no
+interdependency (each owns a distinct file/config surface, no shared_files). Story 1.8 (CI workflow)
+requires all of 1.1-1.7, since its AC-4 explicitly exercises dbt compile/parse against their combined
+output (strongest edge: 1.5's fact.sql ref() calls must resolve). Updated Requires column in the Story
+Tracker and story headers in stories.md. Added ## Dependency Graph section (Mermaid graph + ready-stories
+summary) to aire-state.md. 7 of 8 stories immediately startable — satisfies team_size=2 parallelism
+target. Announcing and proceeding automatically to Workflow Planning (no approval gate on this stage).
+
+---

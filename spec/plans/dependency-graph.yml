@@ -1,0 +1,56 @@
+version: 1
+generated_at: 2026-09-14
+team_size: 2
+
+shared_files: []
+# No two stories touch the same file. Stories 1.1-1.7 each own a distinct file/config surface.
+# Story 1.8 (CI) reads the combined output of all others but does not edit their files.
+
+stories:
+  - id: "1.1"
+    title: Replace inline AWS credentials with a Snowflake Storage Integration
+    tracker_id: "1"
+    requires: []
+    enables: ["1.8"]
+
+  - id: "1.2"
+    title: Externalize dbt connection secrets via environment variables
+    tracker_id: "2"
+    requires: []
+    enables: ["1.8"]
+
+  - id: "1.3"
+    title: Add core data integrity tests (uniqueness, not-null, referential integrity)
+    tracker_id: "3"
+    requires: []
+    enables: ["1.8"]
+
+  - id: "1.4"
+    title: Add accepted-values tests for derived categorical columns
+    tracker_id: "4"
+    requires: []
+    enables: ["1.8"]
+
+  - id: "1.5"
+    title: Fix fact.sql to depend on dimension snapshots via ref()
+    tracker_id: "5"
+    requires: []
+    enables: ["1.8"]
+
+  - id: "1.6"
+    title: Reconcile the Bronze materialization configuration conflict
+    tracker_id: "6"
+    requires: []
+    enables: ["1.8"]
+
+  - id: "1.7"
+    title: Add source freshness checks to the staging source
+    tracker_id: "7"
+    requires: []
+    enables: ["1.8"]
+
+  - id: "1.8"
+    title: Add a static-validation CI workflow
+    tracker_id: "8"
+    requires: ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7"]
+    enables: []

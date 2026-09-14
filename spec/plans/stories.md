@@ -7,7 +7,7 @@ Snowflake account or AWS credentials exist in this environment (REQ-NF-02).
 
 ---
 
-## Story 1.1 — Replace inline AWS credentials with a Snowflake Storage Integration
+## Story 1.1 (Requires: none) — Replace inline AWS credentials with a Snowflake Storage Integration
 
 **Tracker ID**: [#1](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)
 
@@ -25,7 +25,7 @@ Snowflake account or AWS credentials exist in this environment (REQ-NF-02).
 
 ---
 
-## Story 1.2 — Externalize dbt connection secrets via environment variables
+## Story 1.2 (Requires: none) — Externalize dbt connection secrets via environment variables
 
 **Tracker ID**: [#2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)
 
@@ -44,7 +44,7 @@ Snowflake account or AWS credentials exist in this environment (REQ-NF-02).
 
 ---
 
-## Story 1.3 — Add core data integrity tests (uniqueness, not-null, referential integrity)
+## Story 1.3 (Requires: none) — Add core data integrity tests (uniqueness, not-null, referential integrity)
 
 **Tracker ID**: [#3](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/3)
 
@@ -63,7 +63,7 @@ Snowflake account or AWS credentials exist in this environment (REQ-NF-02).
 
 ---
 
-## Story 1.4 — Add accepted-values tests for derived categorical columns
+## Story 1.4 (Requires: none) — Add accepted-values tests for derived categorical columns
 
 **Tracker ID**: [#4](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/4)
 
@@ -80,7 +80,7 @@ Snowflake account or AWS credentials exist in this environment (REQ-NF-02).
 
 ---
 
-## Story 1.5 — Fix `fact.sql` to depend on dimension snapshots via `ref()`
+## Story 1.5 (Requires: none) — Fix `fact.sql` to depend on dimension snapshots via `ref()`
 
 **Tracker ID**: [#5](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/5)
 
@@ -98,7 +98,7 @@ Snowflake account or AWS credentials exist in this environment (REQ-NF-02).
 
 ---
 
-## Story 1.6 — Reconcile the Bronze materialization configuration conflict
+## Story 1.6 (Requires: none) — Reconcile the Bronze materialization configuration conflict
 
 **Tracker ID**: [#6](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/6)
 
@@ -116,7 +116,7 @@ Snowflake account or AWS credentials exist in this environment (REQ-NF-02).
 
 ---
 
-## Story 1.7 — Add source freshness checks to the staging source
+## Story 1.7 (Requires: none) — Add source freshness checks to the staging source
 
 **Tracker ID**: [#7](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/7)
 
@@ -133,7 +133,7 @@ Snowflake account or AWS credentials exist in this environment (REQ-NF-02).
 
 ---
 
-## Story 1.8 — Add a static-validation CI workflow
+## Story 1.8 (Requires: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7) — Add a static-validation CI workflow
 
 **Tracker ID**: [#8](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/8)
 

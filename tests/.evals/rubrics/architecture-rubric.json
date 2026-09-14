@@ -1,0 +1,42 @@
+{
+  "rubricName": "Architectural Alignment - Hospitality Analytics Pipeline",
+  "rubricVersion": "1.0.0",
+  "derivedFrom": ["spec/plans/architecture.md#10-verifiable-constraints"],
+  "evalCriteria": [
+    {
+      "id": "ARCH-01",
+      "metric": "No plaintext or hard-coded credentials",
+      "weight": 0.30,
+      "prompt": "Any changed .sql/.yml file in the diff containing a literal aws_key_id=/aws_secret_key=/a literal password: value that is not {{ env_var(...) }} scores 0.",
+      "source": "spec/plans/requirements.md REQ-F-01, REQ-F-02, REQ-NF-01"
+    },
+    {
+      "id": "ARCH-02",
+      "metric": "dbt dependencies resolved via ref()/source(), never hard-coded table names",
+      "weight": 0.20,
+      "prompt": "Any changed .sql model file in src/dbt_code/models/ containing a literal fully-qualified table reference (e.g. AIRBNB.GOLD.DIM_LISTINGS) to another in-project model scores 0.",
+      "source": "spec/plans/requirements.md REQ-F-06; spec/plans/atlas-deep-dive.md Dependency Health section"
+    },
+    {
+      "id": "ARCH-03",
+      "metric": "No behavioral or schema change to existing Gold outputs",
+      "weight": 0.20,
+      "prompt": "A diff to fact.sql/obt.sql/snapshots/*.yml that adds, removes, or renames a selected column, changes a join type, or changes a computed value's logic (outside of the ref() mechanism fix itself) scores 0.",
+      "source": "spec/plans/requirements.md REQ-NF-03"
+    },
+    {
+      "id": "ARCH-04",
+      "metric": "Every new dbt test is statically valid and resolves to a real model/column",
+      "weight": 0.15,
+      "prompt": "A new/changed YAML test block whose model:/column_name:/field: does not match a real model or column defined elsewhere in the diff or existing codebase scores 0.",
+      "source": "spec/plans/requirements.md REQ-F-03, REQ-F-04, REQ-F-05, REQ-F-08"
+    },
+    {
+      "id": "ARCH-05",
+      "metric": "CI workflow requires no secret or paid service",
+      "weight": 0.15,
+      "prompt": "Any secrets. reference, or a step requiring network credentials to a live Snowflake account, in .github/workflows/dbt-static-checks.yml scores 0.",
+      "source": "spec/plans/requirements.md REQ-F-09, REQ-NF-04"
+    }
+  ]
+}

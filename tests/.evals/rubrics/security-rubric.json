@@ -1,0 +1,47 @@
+{
+  "rubricName": "Security - OWASP Top 10:2025 - Hospitality Analytics Pipeline",
+  "rubricVersion": "1.0.0",
+  "derivedFrom": ["OWASP Top 10:2025", "spec/plans/architecture.md"],
+  "evalCriteria": [
+    {
+      "id": "SEC-01",
+      "owasp": "A04:2025",
+      "metric": "Cryptographic Failures (credential/secret handling)",
+      "weight": 0.35,
+      "prompt": "Review every changed .sql/.yml/.env file. Score 0 if any changed file contains a literal AWS access key, secret key, Snowflake password, or any other credential value that is not routed through env_var() or a Snowflake Storage Integration object. Cite the file and line.",
+      "source": "https://owasp.org/Top10/2025/A04_2025-Cryptographic_Failures/"
+    },
+    {
+      "id": "SEC-02",
+      "owasp": "A05:2025",
+      "metric": "Injection",
+      "weight": 0.20,
+      "prompt": "Review every changed dbt model (.sql) for Jinja-templated values that are concatenated into SQL without dbt's own parameterization/quoting mechanisms (e.g. raw string interpolation of user- or config-supplied values into a query without {{ }} escaping). Score 0 if any changed model does this. Cite the file and line.",
+      "source": "https://owasp.org/Top10/2025/A05_2025-Injection/"
+    },
+    {
+      "id": "SEC-03",
+      "owasp": "A03:2025",
+      "metric": "Software Supply Chain Failures",
+      "weight": 0.20,
+      "prompt": "Review the new/changed GitHub Actions workflow file(s). Score 0 if any step pins an action or dependency to an unpinned/mutable ref (e.g. @main, @master, a floating tag) instead of a pinned version/SHA, or installs a package from an unofficial/untrusted source. Cite the file and line.",
+      "source": "https://owasp.org/Top10/2025/A03_2025-Software_Supply_Chain_Failures/"
+    },
+    {
+      "id": "SEC-04",
+      "owasp": "A02:2025",
+      "metric": "Security Misconfiguration",
+      "weight": 0.15,
+      "prompt": "Review changed Snowflake DDL (Stage.sql, Create_Table.sql) and dbt config (profiles.yml, dbt_project.yml). Score 0 if any changed config grants overly broad access (e.g. a stage or storage integration scoped wider than the specific S3 path/bucket needed) or leaves a default/insecure setting where a secure alternative was available and documented. Cite the file and line.",
+      "source": "https://owasp.org/Top10/2025/A02_2025-Security_Misconfiguration/"
+    },
+    {
+      "id": "SEC-05",
+      "owasp": "A08:2025",
+      "metric": "Software or Data Integrity Failures",
+      "weight": 0.10,
+      "prompt": "Review changed dbt models/tests for data-integrity enforcement. Score 0 if a new schema test (unique/not_null/relationships/accepted_values) is declared but does not actually reference a real, existing model/column (a test that silently never runs is a data-integrity failure, not a passing safeguard). Cite the file and line.",
+      "source": "https://owasp.org/Top10/2025/A08_2025-Software_or_Data_Integrity_Failures/"
+    }
+  ]
+}

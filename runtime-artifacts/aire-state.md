@@ -128,8 +128,19 @@ immediately parallelizable.
 - [x] Requirements Analysis (spec/plans/requirements.md — APPROVED 2026-09-14T08:11:00Z)
 - [x] User Stories — COMPLETE (8 stories generated, GATE 1 approved, pushed to GitHub as issues #1-#8, linked to Milestone #1)
 - [x] Dependency Graph — COMPLETE (spec/plans/dependency-graph.yml; 7/8 stories immediately startable)
-- [ ] Workflow Planning
-- [ ] Application Design
-- [ ] System-Level Design stages
-- [ ] STOP CHECKPOINT
-- [ ] Code Generation (per-story via dev-implement)
+- [x] Workflow Planning — COMPLETE (spec/plans/executions.md — Application Design SKIP; Functional/NFR Requirements/NFR Design/Infrastructure Design all SKIP; Code Generation EXECUTE)
+- [ ] Application Design (SKIP per executions.md)
+
+### 🟢 IMPLEMENTATION PHASE
+- [ ] Functional Design (SKIP per executions.md)
+- [ ] NFR Requirements (SKIP per executions.md)
+- [ ] NFR Design (SKIP per executions.md)
+- [ ] Infrastructure Design (SKIP per executions.md)
+- [x] STOP CHECKPOINT — Design complete: architecture.md v1.0.0, behavior.feature, rubrics + config.json + CI pipeline generated, SonarQube wired (enabled=true, gates+=sonarqube)
+- [ ] Code Generation (per-story via dev-implement) — EXECUTE, awaiting user's dev-implement trigger
+
+## Current Status
+- **Lifecycle Phase**: IMPLEMENTATION
+- **Current Stage**: Design complete — awaiting dev-implement
+- **Next Stage**: Code Generation (per-story, triggered by `dev-implement`)
+- **Status**: Ready to proceed — 7 of 8 stories immediately startable (Story 1.8 last)

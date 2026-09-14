@@ -301,3 +301,84 @@ summary) to aire-state.md. 7 of 8 stories immediately startable — satisfies te
 target. Announcing and proceeding automatically to Workflow Planning (no approval gate on this stage).
 
 ---
+
+**Timestamp**: 2026-09-14T08:37:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Workflow Planning - Plan Finalized (auto-approved, no gate)
+**AI Response**: "Execution plan created with 5 stages executed in Planning (Workspace Detection,
+Requirements Analysis, User Stories, Dependency Graph, Workflow Planning), Reverse Engineering skipped
+(Atlas reused), and 5 Implementation-phase design stages skipped (Application Design, Functional
+Design, NFR Requirements, NFR Design, Infrastructure Design) - risk assessed Low, no new components/
+services/infrastructure, NFRs already fully captured as REQ-NF-01..04 and story ACs. Proceeded
+automatically to the STOP CHECKPOINT without an approval gate."
+**Status**: Auto-approved
+**Context**: spec/plans/executions.md written; all conditional Implementation-phase design stages
+SKIP with rationale; Code Generation EXECUTE (per-story via dev-implement, after STOP CHECKPOINT).
+
+---
+
+**Timestamp**: 2026-09-14T08:40:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: STOP CHECKPOINT - Behavior spec + architecture.md written
+**Details**: Wrote spec/behavior.feature (0 cross-story scenarios - explicit assessment recorded: this
+epic's 8 stories have no genuine cross-story journey; the one composition point, Story 1.8's CI
+validating all others compile together, is already that story's own AC/feature file, so restating it
+here would violate the no-copy rule). Wrote spec/plans/architecture.md v1.0.0, assembled from
+atlas-deep-dive.md + requirements.md + stories.md (all system-level design stages were SKIPPED per
+executions.md - each architecture.md section says so explicitly per the design-stage-skip rule rather
+than inventing a decision). Includes both ALWAYS-mandatory diagrams (C4Context system context, Section
+1; flowchart component architecture, Section 2) plus an erDiagram (Section 4, since schema tests
+touch entity definitions). All 3 diagrams manually validated for syntactic correctness (bracket
+balance, valid Mermaid dialect keywords) - no mermaid-cli available locally to auto-render, so manual
+review was the verification method. Section 10 Verifiable Constraints: 5 constraints (ARCH-01..05),
+weights sum to 1.00, each traced to a REQ-ID.
+
+---
+
+**Timestamp**: 2026-09-14T08:45:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: STOP CHECKPOINT - rubrics + config.json created; CI pipeline generation delegated
+**Details**: Created tests/.evals/config.json (deterministic template, single root ".", stack python
+3.12, sourcePaths [src/dbt_code, src/snowflake], since this is a dbt project with no traditional
+pytest coverage flow). Created tests/.evals/rubrics/architecture-rubric.json (5 criteria ARCH-01..05,
+derived 1:1 from architecture.md Section 10, weights sum 1.0) and security-rubric.json (5 OWASP-based
+criteria SEC-01..05, weights sum 1.0, biased toward A04 Cryptographic Failures given this epic's
+credential-hardening focus). All three JSON files validated to parse correctly. Delegated the
+mechanical CI pipeline generation (copying from aire-workflow/templates/ci/, slot substitution,
+YAML validation) to a background agent per ci-pipeline-generation.md - this keeps the file-copying
+work isolated while the SonarQube setup gate (Section 4.1.2) will be presented directly, verbatim, by
+the main session once the agent returns, per CLAUDE.md's explicit prohibition on ever summarizing that
+gate.
+
+---
+
+**Timestamp**: 2026-09-14T10:45:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: STOP CHECKPOINT - CI pipeline generated (background agent) + SonarQube setup gate
+**Details**: Background agent completed CI pipeline generation, copying byte-for-byte from
+aire-workflow/templates/ci/ (agentic-eval-pipeline.yml, tests/.evals/scripts/*.sh, behavior/
+Containerfile+run.sh, sonar-project.properties). Disclosed deviations: added real D1/D2/D5/D6 tool
+invocations (ruff/mypy/pip-licenses/radon) the template stubbed for per-stack resolution, plus
+corresponding config.json tools/toolInstallCommands entries; fixed .gitignore gaps that would have
+silently dropped tracked AIRE artifacts (config.json, rubrics, sonar-project.properties). Verified: YAML
+parses clean; actionlint unavailable locally (recorded honestly); validate-pipeline.sh run repeatedly
+with real findings fixed (V7, V7b, V35, one local pipefail bug), 2 remaining flagged items confirmed as
+false positives in the framework's OWN unmodified template text (SONAR_STEPS `|| true` under
+pipefail; the sanctioned rubric-absent N/A string) - not touched, per the never-hand-patch-a-template
+rule. Also surfaced 2 gitleaks findings.
+**Independent verification of gitleaks findings**: ran `gitleaks detect` locally - both findings are
+false positives (curl-auth-user rule matching `curl -u "${SONAR_TOKEN}:"` inside
+aire-workflow/templates/ci/agentic-eval-pipeline.yml.template's OWN Sonar Web API query - a legitimate
+env-var reference, not a literal secret; inherent to the AIRE framework template, not this project's
+code). No remediation needed, not blocking.
+**SonarQube setup gate (Section 4.1.2)**: presented verbatim per CLAUDE.md's mandatory exact-block
+rule. User raw response: "oroceed" (typo for "proceed") -> confirmed via clarifying context. User set
+up GitHub Actions secrets (CLAUDE_CODE_OAUTH_TOKEN, SONAR_TOKEN, SONAR_HOST_URL) via SonarQube Cloud.
+Verified via `gh secret list` - all 3 present. Wired the two SONAR_STEPS (SonarQube scan +
+SonarQube quality gate, both with if: always() && skip != true, continue-on-error: true, per-step env)
+into the pipeline in place of the disabled-state comment block. Set sonarqube.enabled: true and added
+"sonarqube" to ci.gates in config.json. Asked and received the SonarCloud organization key
+("revanta-biswas") and substituted it into sonar-project.properties (was YOUR_ORG_NAME placeholder).
+Re-validated: pipeline YAML and config.json both parse clean after the edits.
+
+---

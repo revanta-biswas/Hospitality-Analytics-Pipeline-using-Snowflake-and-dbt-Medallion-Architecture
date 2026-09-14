@@ -35,6 +35,12 @@ logs/
 *.csv
 *.parquet
 *.json
+# 🔴 AIRE CI/eval artifacts are real, tracked config — not generated Snowflake output. The blanket
+#    *.json rule above would otherwise silently drop tests/.evals/config.json, the rubrics and the
+#    per-work-unit ci-manifest.d/ fragments (common/ci-pipeline-generation.md Section 4.0f.1).
+!tests/.evals/config.json
+!tests/.evals/rubrics/**/*.json
+!tests/.evals/ci-manifest.d/**/*.json
 
 # 🔹 Build / Distribution
 build/
@@ -54,3 +60,10 @@ dist/
 
 *.toml
 *.lock
+!pyproject.toml
+!sonar-project.properties
+
+# 🔹 AIRE CI scratch state — never committed, purged at the start of every CI run
+#    (common/ci-pipeline-generation.md Section 4.0e). The story's own reports/eval-evidence/story-*/
+#    directory IS tracked; only this scratch working directory is ignored.
+tests/.evals/_run/

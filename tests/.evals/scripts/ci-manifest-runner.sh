@@ -200,10 +200,10 @@ case "$MODE" in
     done < <(jq -r '.[] | [.root, (.stack // "unknown"), (.markerFile // "")] | @tsv' "$MERGED_MANIFEST" | tr -d '\r')
     ;;
   coverage)
-    while IFS=$'\t' read -r root stack marker cmd no_tests_exit; do
+    while IFS=$'\x1f' read -r root stack marker cmd no_tests_exit; do
       [ -z "$root" ] && continue
       run_root "$root" "$stack" "$marker" "$cmd" "$no_tests_exit"
-    done < <(jq -r '.[] | [.root, (.stack // "unknown"), (.markerFile // ""), (.coverageCommand // ""), (.noTestsExitCode // "" | tostring)] | @tsv' "$MERGED_MANIFEST" | tr -d '\r')
+    done < <(jq -r '.[] | [.root, (.stack // "unknown"), (.markerFile // ""), (.coverageCommand // ""), (.noTestsExitCode // "" | tostring)] | join("")' "$MERGED_MANIFEST" | tr -d '\r')
     ;;
 esac
 

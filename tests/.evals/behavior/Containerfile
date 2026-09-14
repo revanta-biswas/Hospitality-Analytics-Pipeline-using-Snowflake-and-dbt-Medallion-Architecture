@@ -1,15 +1,12 @@
 # Behaviour test image — built and run by Podman locally and in CI (identical image, Section 4.1b).
-# ${BEHAVIOR_BASE_IMAGE} is the only slot: the generator sets it to the stack's runtime base image
-# (e.g. docker.io/library/python:3.12-slim, docker.io/library/node:20-slim, maven:3.9-eclipse-temurin).
-FROM ${BEHAVIOR_BASE_IMAGE}
+# Base image resolved for this repo's stack: Python 3.12 (pyproject.toml requires-python >=3.12).
+FROM docker.io/library/python:3.12-slim
 
 WORKDIR /work
 
-# The generator appends the stack's Gherkin runner install between the markers (Section 3):
-#   Python  : pip install pytest-bdd
-#   JS/TS   : npm i -g @cucumber/cucumber
-#   Java    : (bundled via mvn verify -Dcucumber)
+# Stack's Gherkin runner install (Python -> pytest-bdd, per common/behavior-spec.md Section 4.1):
 # >>> STACK-RESOLVED BEHAVIOUR DEPS START <<<
+RUN pip install --no-cache-dir pytest-bdd
 # >>> STACK-RESOLVED BEHAVIOUR DEPS END <<<
 
 # run.sh is bind-mounted with the repo at runtime; nothing to COPY.

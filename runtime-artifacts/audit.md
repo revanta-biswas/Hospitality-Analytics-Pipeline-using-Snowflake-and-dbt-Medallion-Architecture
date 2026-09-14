@@ -382,3 +382,54 @@ into the pipeline in place of the disabled-state comment block. Set sonarqube.en
 Re-validated: pipeline YAML and config.json both parse clean after the edits.
 
 ---
+
+**Timestamp**: 2026-09-14T10:50:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: STOP CHECKPOINT - committed and pushed; epic-level smoke test started
+**Details**: Committed all STOP CHECKPOINT artifacts (commit c513199) and pushed to
+epic/harden-pipeline-security-and-data-quality. Before Development Handoff, presented the mandatory
+smoke-test-epic.sh step to the user (it opens a real zero-diff scratch PR + triggers real CI runs,
+so confirmed first per this session's risk-communication norms even though CLAUDE.md marks the step
+itself as automatic). User confirmed: "Run it now (Recommended)". Started
+tests/.evals/scripts/smoke-test-epic.sh epic/harden-pipeline-security-and-data-quality harden-pipeline
+in the background - this validates the generated environment/pipeline via a zero-diff scratch branch
+before any story development starts (common/ci-pipeline-generation.md Section 4.0.6). Per CLAUDE.md,
+this loop is UNBOUNDED (the one named exception to the 3-attempt self-healing cap) - it terminates on
+a genuine pass, or when self-repair itself stops producing new runs.
+
+---
+
+**Timestamp**: 2026-09-14T11:15:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: STOP CHECKPOINT - smoke test FAILED (attempt 1), 5 real defects found and fixed
+**Details**: First smoke-test-epic.sh run failed. Self-repair (CI job) diagnosed and fixed 4 real
+generation defects, but committed the fix locally on the ephemeral runner WITHOUT pushing (its own
+re-verification hit a 5th, separate defect and correctly declined to push an unverified fix) - so
+those 4 fixes were lost from the remote branch. Reproduced and reapplied all 4 directly on the epic
+branch, plus found and fixed the 5th defect (root cause of self-repair's own re-verification failure)
+myself:
+1. semgrep==1.127.0 pulled opentelemetry-instrumentation -> pkg_resources import crash against the
+   runner's setuptools 84.0.0. Bumped to semgrep==1.177.0 in tests/.evals/config.json.
+2. ci-manifest-runner.sh's coverage case used `IFS=$'\t' read` on a TSV row with an empty
+   coverageCommand field - bash's IFS-whitespace collapsing silently absorbed the next field
+   (noTestsExitCode) into $cmd. Switched the field delimiter to the ASCII Unit Separator (0x1F, via
+   jq's own join()) so empty fields no longer collapse.
+3. run-static-evals.sh's coverage_delta() checked "is a coverage report configured" before "did
+   anything change" - a zero-diff run hard-errored on the placeholder coverageReportPath instead of
+   ever reaching its own vacuous-pass branch. Moved the changed-files check to the top of the function.
+4. tests/.evals/behavior/Containerfile still had the literal unsubstituted ${BEHAVIOR_BASE_IMAGE}
+   placeholder in FROM (never resolved during generation) - podman build would fail with "no FROM
+   statement found". Resolved to docker.io/library/python:3.12-slim (per pyproject.toml
+   requires-python >=3.12) and filled the DEPS marker with `pip install pytest-bdd`.
+5. (found independently, not by self-repair) tests/.evals/config.json's judge.model still carried the
+   literal unsubstituted template placeholder "<resolved session model id>" - I had failed to
+   substitute the real model when I wrote this file earlier. Fixed to "claude-sonnet-5" (this
+   session's actual model).
+Also fixed, while in the file: SonarSource/sonarqube-scan-action pinned to the deprecated/vulnerable
+@v4 (flagged by GitHub's own annotation in the first run) -> bumped to @v6.
+All fixes validated: config.json/YAML parse clean, both edited .sh scripts pass `bash -n`, the
+IFS-fix was independently verified by executing the actual patched snippet against a synthetic
+manifest row with an empty coverageCommand - correctly parsed cmd="" and no_tests_exit="5" (previously
+would have collapsed). Committing and re-running the smoke test.
+
+---

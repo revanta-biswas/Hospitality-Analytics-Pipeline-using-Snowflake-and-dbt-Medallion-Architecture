@@ -437,6 +437,17 @@ coverage_delta() {
   local min changed hit=0 found=0 f had_error=0 unmatched_files=""
   min=$(jq -r '.thresholds.unitTestCoverageMin // 90' "$CONFIG")
 
+  # 🔴 Check "did anything change" BEFORE "is a coverage report configured". A zero-diff run (e.g.
+  #    the epic-level smoke test) must vacuously PASS even when coverageReportPath is a placeholder/
+  #    unset — there is nothing to measure coverage on either way. Checking config-presence first
+  #    means a repo with no coverage report configured yet hard-errors on every zero-diff PR before
+  #    ever reaching this vacuous-pass branch, which is wrong: no changed file means nothing to gate.
+  changed="$(git diff --name-only "${BASE_SHA}...HEAD" -- "${SOURCES[@]}" 2>/dev/null || true)"
+  if [ -z "$changed" ]; then
+    record unitCoverage PASS "no changed files under ${SOURCES[*]} — threshold vacuously satisfied"
+    return
+  fi
+
   # 🔴 Preference order: the MERGED ci.roots[] view (config.json + every ci-manifest.d/*.json fragment,
   #    Section 4.0f — each entry carrying its own coverageReportPath, relative to that root, plus
   #    format/sourcePaths) → legacy ci.coverageReports[] (no root concept, reports already at a
@@ -473,12 +484,6 @@ coverage_delta() {
 
   if ! command -v python3 >/dev/null 2>&1 && printf '%s\n' "${REPORT_FORMATS[@]}" | grep -qE '^(cobertura|jacoco)$'; then
     record unitCoverage ERROR "ci.roots[].coverageFormat cobertura/jacoco requires python3, which is not installed"
-    return
-  fi
-
-  changed="$(git diff --name-only "${BASE_SHA}...HEAD" -- "${SOURCES[@]}" 2>/dev/null || true)"
-  if [ -z "$changed" ]; then
-    record unitCoverage PASS "no changed files under ${SOURCES[*]} — threshold vacuously satisfied"
     return
   fi
 

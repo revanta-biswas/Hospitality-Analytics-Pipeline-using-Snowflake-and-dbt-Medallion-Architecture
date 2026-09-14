@@ -27,7 +27,7 @@
     "enabled": true,
     "_comment": "Set true when CI generation creates sonar-project.properties and the user answers proceed at the setup gate. Additive to semgrep, never a replacement."
   },
-  "judge": { "model": "<resolved session model id>", "rubricVersion": "1.0.0" },
+  "judge": { "model": "claude-sonnet-5", "rubricVersion": "1.0.0" },
   "ci": {
     "baseBranch": "main",
     "integrationBranchPrefixes": ["epic", "bug", "enh", "ci", "story", "ve"],
@@ -50,7 +50,7 @@
         "testPaths": ["tests/unit"],
         "tools": ["semgrep", "pip-audit", "gitleaks", "ruff", "mypy", "pip-licenses", "radon"],
         "toolInstallCommands": {
-          "semgrep": "pip install \"semgrep==1.127.0\"",
+          "semgrep": "pip install \"semgrep==1.177.0\"",
           "pip-audit": "pip install \"pip-audit==2.9.0\"",
           "gitleaks": "gitleaks_version=8.21.2; curl -sSfL \"https://github.com/gitleaks/gitleaks/releases/download/v${gitleaks_version}/gitleaks_${gitleaks_version}_linux_x64.tar.gz\" | tar xz -C /usr/local/bin gitleaks",
           "ruff": "pip install \"ruff==0.9.6\"",

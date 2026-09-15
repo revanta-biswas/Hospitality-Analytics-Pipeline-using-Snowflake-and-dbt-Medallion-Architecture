@@ -41,6 +41,7 @@ logs/
 !tests/.evals/config.json
 !tests/.evals/rubrics/**/*.json
 !tests/.evals/ci-manifest.d/**/*.json
+!reports/**/*.json
 
 # 🔹 Build / Distribution
 build/

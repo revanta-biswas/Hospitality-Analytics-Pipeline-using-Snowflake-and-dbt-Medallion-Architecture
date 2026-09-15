@@ -73,7 +73,7 @@
 
 | Story | Title | Requires | Tracker ID | Status | PR | Merged | Start | End | Recorded |
 |-------|-------|----------|------------|--------|----|--------|-------|-----|----------|
-| 1.1 | Replace inline AWS credentials with a Snowflake Storage Integration | none | #1 | 🔵 In Development | — | — | 2026-09-14 | | 2026-09-14 12:00 |
+| 1.1 | Replace inline AWS credentials with a Snowflake Storage Integration | none | #1 | 🔵 In Development | [#11](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/pull/11) | no | 2026-09-14 | | 2026-09-15 09:55 |
 | 1.2 | Externalize dbt connection secrets via environment variables | none | #2 | 🟢 Ready for Development | — | — | | | 2026-09-14 08:34 |
 | 1.3 | Add core data integrity tests (uniqueness, not-null, referential integrity) | none | #3 | 🟢 Ready for Development | — | — | | | 2026-09-14 08:34 |
 | 1.4 | Add accepted-values tests for derived categorical columns | none | #4 | 🟢 Ready for Development | — | — | | | 2026-09-14 08:34 |

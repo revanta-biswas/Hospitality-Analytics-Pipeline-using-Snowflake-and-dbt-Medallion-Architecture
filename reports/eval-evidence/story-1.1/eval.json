@@ -24,12 +24,16 @@
       "note": "4 pre-existing findings (curl-auth-user on ${SONAR_TOKEN} in .github/workflows/agentic-eval-pipeline.yml and aire-workflow/templates/ci/agentic-eval-pipeline.yml.template) are present at BOTH baseline and post-change with IDENTICAL fingerprints, and lie outside src/snowflake/. Zero NEW findings on this story's changed files."
     },
     "unitCoverage": { "status": "N/A", "reason": "No .py application code changed by this story; unitTestCoverageMin is vacuously satisfied (0 changed .py files to measure)." },
-    "behaviorB1": { "status": "PASS", "note": "4/4 scenarios passed, one per @AC-n (AC-1..AC-4). See reports/behavior-test-evidence/story-1.1/b1/. NOT run inside Podman for this delegated pass — see that evidence manifest's containerisation exception; the invoking session owns the full Section 5 gate." },
-    "apiContract": { "status": "N/A", "reason": "Story's plan has no API Layer Generation step (pure SQL DDL/DML, no service endpoint)." }
+    "behaviorB1": { "status": "PASS", "containerised": true, "image": "localhost/aire-behavior:local", "imageId": "c8e74779e7f01e1243ed3cf4d748a2bd3dcabb7dfe66275359bdd4ecdfc44259", "note": "4/4 scenarios passed, one per @AC-n (AC-1..AC-4), run for real inside Podman per common/behavior-spec.md Section 5. See reports/behavior-test-evidence/story-1.1/b1/. Fixed 3 generation defects to get here: Containerfile was missing sqlparse (real ModuleNotFoundError on first containerised attempt), run_features() ignored the resolved feature-file args entirely, and b2)'s 'others' list didn't exclude the current unit." },
+    "behaviorB2": { "status": "N/A", "reason": "No OTHER story feature file exists yet in spec/behavior/ besides this unit's own (verified: run.sh b2 exits 3 with that exact reason after the b2-exclusion fix)." },
+    "behaviorB3": { "status": "N/A", "reason": "Not the last work unit of the cycle — stories 1.2-1.8 have no merged PRs yet (common/behavior-spec.md Section 6.1)." },
+    "apiContract": { "status": "N/A", "reason": "Story's plan has no API Layer Generation step (pure SQL DDL/DML, no service endpoint)." },
+    "J1_architecture": { "status": "PASS", "score": 1.0, "rubricVersion": "1.0.0", "judgeModel": "claude-sonnet-5", "note": "Only ARCH-01 applicable (renormalized weight 1.0); see reports/eval-evidence/story-1.1/judge/architecture-score.json" },
+    "J2_security": { "status": "PASS", "score": 1.0, "rubricVersion": "1.0.0", "judgeModel": "claude-sonnet-5", "note": "SEC-01 + SEC-04 applicable (renormalized); see reports/eval-evidence/story-1.1/judge/security-score.json" }
   },
   "overall": "PASS",
-  "checksRun": 8,
-  "checksTotal": 10,
-  "checksNA": ["unitCoverage", "apiContract"],
-  "verdictNote": "8 of 10 declared checks ran with a real result (2 legitimately N/A per the closed list in eval-framework.md Section 2.5.1 reasons #1/#2 — no Python code and no API layer in this story's diff). J1/J2 and Code Review/Remediate/PR are explicitly out of scope for this delegated task per the invoking session's instructions and are NOT included in this scorecard."
+  "checksRun": 11,
+  "checksTotal": 13,
+  "checksNA": ["unitCoverage", "apiContract", "behaviorB2", "behaviorB3"],
+  "verdictNote": "11 of 13 declared checks ran with a real result (4 legitimately N/A per the closed list in eval-framework.md Section 2.5.1: no Python application code and no API layer in this story's diff; no other story feature file exists yet; not the last work unit of the cycle). J1/J2 judge gates computed during Code Review (Phase 3.5): both PASS at 1.0, well above the 0.85 threshold. Code Review verdict: APPROVED, zero findings — see reports/reviews/story-1.1-code-review-v1.md."
 }

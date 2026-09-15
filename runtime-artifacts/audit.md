@@ -620,3 +620,86 @@ Committing this work on story/1.1-replace-inline-aws-credentials-storage-integra
 **Context**: Code Generation Part 2 complete (delegated scope only)
 
 ---
+
+**Timestamp**: 2026-09-15T09:00:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.1 - Code Generation Part 1/2 verified independently
+**TRACKER ITEM**: "[Story 1.1](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Reviewed the delegated agent's work (commit 72b91b0). Verified independently rather than trusting the report: (1) grep for aws_key_id/aws_secret_key in src/snowflake/*.sql - zero matches, AC-3 confirmed. (2) Re-ran `python3 -m pytest tests/behavior/ -v` myself - 4/4 scenarios pass, matching the agent's claim. (3) Re-ran `gitleaks detect --source src/snowflake` independently - no leaks found, confirming D7 clean. (4) Reviewed Stage.sql/Copy_Into.sql content directly - a proper CREATE STORAGE INTEGRATION + STORAGE_INTEGRATION stage binding, all COPY INTO credentials clauses removed, with clear operator comments about the required out-of-band AWS IAM trust-policy step. (5) Confirmed B2 tier is legitimately N/A - spec/behavior/ contains only story-1.1.feature (first story of the cycle, no other feature files exist). eval-summary.md correctly scopes overall:PASS to only what this delegated pass covered (static eval + B1), explicitly excluding Code Review/Remediate/PR/J1/J2 from that verdict. Proceeding to Code Review (Section A)."
+**Context**: Post Code-Generation verification, dev-implement Section A prerequisite
+
+---
+
+**Timestamp**: 2026-09-15T09:35:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.1 - Behavioral Test Gate (B1/B2), 3 more generation defects found and fixed
+**TRACKER ITEM**: "[Story 1.1](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "The delegated code-generation task ran B1 natively (not in Podman) and self-reported that
+caveat honestly. Per common/behavior-spec.md Section 5, Podman IS installed on this machine, so the
+native-run exception does not apply - ran the gate for real. Found and fixed 3 more generation
+defects along the way (tests/.evals/behavior/run.sh and its Containerfile were both still unresolved
+canonical-template stubs, never actually exercised until now since the earlier smoke test's zero-diff
+PR legitimately N/A's the whole behavior gate):
+1. run_features() in run.sh (the STACK-RESOLVED BEHAVIOUR RUNNER slot) was unfilled - fixed to invoke
+   pytest-bdd, but the first fix blindly ran `pytest tests/behavior/` ignoring the tier-resolved
+   feature-file arguments entirely, which would make B1/B2 indistinguishable.
+2. Containerfile's DEPS slot only installed pytest-bdd, missing sqlparse (declared in pyproject.toml's
+   [dependency-groups.dev], used by tests/behavior/steps/stage_credential_steps.py) - the FIRST
+   containerised run failed with ModuleNotFoundError, catching a real environment-parity gap the
+   native run had masked. Fixed to install the full dev dependency group.
+3. run_features() re-fixed to resolve each given feature-file argument to its bound test_<key>.py
+   module (naming convention) and run ONLY those - re-verified B1 runs exactly 4 scenarios and B2
+   correctly resolves to nothing extra.
+4. b2)'s `others` list in run.sh included the CURRENT unit's own feature file (never excluded via
+   AIRE_STORY_KEY) - on the very first story this caused B2 to silently run and pass instead of
+   reporting the correct N/A (no OTHER story exists yet); on any later story it would have
+   double-counted the current unit into B2's own scope. Fixed to exclude AIRE_STORY_KEY's file from
+   `others`.
+Rebuilt aire-behavior:local (final image ID c8e74779e7f0...) and re-ran B1 for real: 4/4 scenarios
+pass, containerised, evidence captured to reports/behavior-test-evidence/story-1.1/b1/ (run log +
+JUnit XML report + evidence-manifest.md documenting the fix). B2 correctly resolves N/A (exit 3, 'no
+OTHER story feature file exists yet') - verified. B3 not run: per common/behavior-spec.md Section 6.1
+this is NOT the last work unit (stories 1.2-1.8 have no merged PRs yet), so B3 is correctly deferred by
+dev-implement's own PR-merge-state check, not run at all."
+**Context**: Behavioral Test Gate (Step 6.1), dev-implement Code Generation Part 2
+
+---
+
+**Timestamp**: 2026-09-15T09:45:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.1 - Automated Code Review complete
+**TRACKER ITEM**: "[Story 1.1](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Ran Code Review (INITIAL_REVIEW, no prior report existed) scoped to Story 1.1. Phase 2 AC
+verification: all 4 ACs Met with file:line evidence, independently re-verified (not just cited from
+generation). Phase 2.5 Security Baseline (diff-scoped): 2/16 rules applicable (SECURITY-06
+least-privilege - compliant, STORAGE_ALLOWED_LOCATIONS scoped to specific path not wildcard;
+SECURITY-12 no-hardcoded-credentials - compliant, zero matches independently grepped) - report at
+reports/code-security-reviews/security-review-2026-09-15.md, verdict PASS, 0 findings. Phase 3.5 Judge
+Gates: J1=1.0 (only ARCH-01 applicable, renormalized), J2=1.0 (SEC-01+SEC-04 applicable, renormalized)
+- both far above the 0.85 threshold, scored once, all applicable criteria cited file:line. Report
+written to reports/reviews/story-1.1-code-review-v1.md."
+**Context**: dev-implement Section A (Auto Code Review)
+
+---
+
+ Automated Code Review complete for Story 1.1.
+   Report: reports/reviews/story-1.1-code-review-v1.md
+   Status: APPROVED
+   Issues: 0 Blocker | 0 High
+
+**Timestamp**: 2026-09-15T09:45:30Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.1 - Review Verdict Routing (Section B, automatic)
+**TRACKER ITEM**: "[Story 1.1](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Verdict is APPROVED with zero findings - routing straight to commit/push/PR (Section D). No Remediate loop needed (SH-LOOP-5 not entered)."
+**Context**: dev-implement Section B routing
+
+---

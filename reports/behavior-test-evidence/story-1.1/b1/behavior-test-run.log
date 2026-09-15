@@ -1,0 +1,58 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0 -- /opt/homebrew/opt/python@3.14/bin/python3.14
+cachedir: .pytest_cache
+rootdir: /Users/revanta.biswas/Desktop/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture
+configfile: pyproject.toml
+plugins: anyio-4.15.0, bdd-8.1.0
+collecting ... collected 4 items
+
+tests/behavior/test_story_1_1.py::test_stagesql_creates_a_storage_integration_and_binds_the_stage_to_it PASSED [ 25%]
+tests/behavior/test_story_1_1.py::test_copy_intosql_no_longer_contains_any_credentials_clause PASSED [ 50%]
+tests/behavior/test_story_1_1.py::test_repowide_search_for_aws_key_literals_returns_zero_matches PASSED [ 75%]
+tests/behavior/test_story_1_1.py::test_edited_sql_is_syntactically_valid_snowflake_ddldml_without_a_live_account PASSED [100%]
+
+=============================== warnings summary ===============================
+../../../../opt/homebrew/lib/python3.14/site-packages/gherkin/gherkin_line.py:79
+../../../../opt/homebrew/lib/python3.14/site-packages/gherkin/gherkin_line.py:79
+../../../../opt/homebrew/lib/python3.14/site-packages/gherkin/gherkin_line.py:79
+../../../../opt/homebrew/lib/python3.14/site-packages/gherkin/gherkin_line.py:79
+../../../../opt/homebrew/lib/python3.14/site-packages/gherkin/gherkin_line.py:79
+../../../../opt/homebrew/lib/python3.14/site-packages/gherkin/gherkin_line.py:79
+../../../../opt/homebrew/lib/python3.14/site-packages/gherkin/gherkin_line.py:79
+  /opt/homebrew/lib/python3.14/site-packages/gherkin/gherkin_line.py:79: DeprecationWarning: 'maxsplit' is passed as positional argument
+    uncommented_line = re.split(r"\s#", self._trimmed_line_text.strip(), 2)[0]
+
+../../../../opt/homebrew/lib/python3.14/site-packages/pytest_bdd/plugin.py:137
+  /opt/homebrew/lib/python3.14/site-packages/pytest_bdd/plugin.py:137: PytestUnknownMarkWarning: Unknown pytest.mark.AC-1 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    mark = getattr(pytest.mark, tag)
+
+../../../../opt/homebrew/lib/python3.14/site-packages/pytest_bdd/plugin.py:137
+  /opt/homebrew/lib/python3.14/site-packages/pytest_bdd/plugin.py:137: PytestUnknownMarkWarning: Unknown pytest.mark.AC-2 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    mark = getattr(pytest.mark, tag)
+
+../../../../opt/homebrew/lib/python3.14/site-packages/pytest_bdd/plugin.py:137
+  /opt/homebrew/lib/python3.14/site-packages/pytest_bdd/plugin.py:137: PytestUnknownMarkWarning: Unknown pytest.mark.AC-3 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    mark = getattr(pytest.mark, tag)
+
+../../../../opt/homebrew/lib/python3.14/site-packages/pytest_bdd/plugin.py:137
+  /opt/homebrew/lib/python3.14/site-packages/pytest_bdd/plugin.py:137: PytestUnknownMarkWarning: Unknown pytest.mark.AC-4 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    mark = getattr(pytest.mark, tag)
+
+tests/behavior/test_story_1_1.py::test_stagesql_creates_a_storage_integration_and_binds_the_stage_to_it
+tests/behavior/test_story_1_1.py::test_copy_intosql_no_longer_contains_any_credentials_clause
+tests/behavior/test_story_1_1.py::test_repowide_search_for_aws_key_literals_returns_zero_matches
+tests/behavior/test_story_1_1.py::test_edited_sql_is_syntactically_valid_snowflake_ddldml_without_a_live_account
+tests/behavior/test_story_1_1.py::test_edited_sql_is_syntactically_valid_snowflake_ddldml_without_a_live_account
+  /opt/homebrew/lib/python3.14/site-packages/pytest_bdd/compat.py:28: PytestRemovedIn10Warning: Passing nodeid to _register_fixture is deprecated. Pass node instead for fixture scoping.
+    request._fixturemanager._register_fixture(
+
+tests/behavior/test_story_1_1.py::test_stagesql_creates_a_storage_integration_and_binds_the_stage_to_it
+tests/behavior/test_story_1_1.py::test_copy_intosql_no_longer_contains_any_credentials_clause
+tests/behavior/test_story_1_1.py::test_repowide_search_for_aws_key_literals_returns_zero_matches
+tests/behavior/test_story_1_1.py::test_edited_sql_is_syntactically_valid_snowflake_ddldml_without_a_live_account
+tests/behavior/test_story_1_1.py::test_edited_sql_is_syntactically_valid_snowflake_ddldml_without_a_live_account
+  /opt/homebrew/lib/python3.14/site-packages/_pytest/fixtures.py:1986: PytestRemovedIn10Warning: Passing baseid to FixtureDef is deprecated. Pass node instead for fixture scoping.
+    fixture_def = FixtureDef(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 4 passed, 21 warnings in 0.05s ========================

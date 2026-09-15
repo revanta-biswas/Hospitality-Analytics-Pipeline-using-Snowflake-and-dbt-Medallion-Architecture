@@ -1,0 +1,43 @@
+=== D7 gitleaks (whole repo diff-scope not yet applicable pre-baseline; scan tree) ===
+
+    ○
+    │╲
+    │ ○
+    ○ ░
+    ░    gitleaks
+
+Finding:     ANALYSIS_ID="$(curl -sf -u [1;3;m"${SONAR_TOKEN}:"[0m "$CE_TASK_URL" 2>/d...
+Secret:      [1;3;m"${SONAR_TOKEN}:"[0m
+RuleID:      curl-auth-user
+Entropy:     3.734522
+File:        .github/workflows/agentic-eval-pipeline.yml
+Line:        330
+Fingerprint: .github/workflows/agentic-eval-pipeline.yml:curl-auth-user:330
+
+Finding:     curl -sf -u [1;3;m"${SONAR_TOKEN}:"[0m "${SERVER_URL}/api/...
+Secret:      [1;3;m"${SONAR_TOKEN}:"[0m
+RuleID:      curl-auth-user
+Entropy:     3.734522
+File:        .github/workflows/agentic-eval-pipeline.yml
+Line:        333
+Fingerprint: .github/workflows/agentic-eval-pipeline.yml:curl-auth-user:333
+
+Finding:     ANALYSIS_ID="$(curl -sf -u [1;3;m"${SONAR_TOKEN}:"[0m "$CE_TASK_URL" 2>/d...
+Secret:      [1;3;m"${SONAR_TOKEN}:"[0m
+RuleID:      curl-auth-user
+Entropy:     3.734522
+File:        aire-workflow/templates/ci/agentic-eval-pipeline.yml.template
+Line:        309
+Fingerprint: aire-workflow/templates/ci/agentic-eval-pipeline.yml.template:curl-auth-user:309
+
+Finding:     curl -sf -u [1;3;m"${SONAR_TOKEN}:"[0m "${SERVER_URL}/api/...
+Secret:      [1;3;m"${SONAR_TOKEN}:"[0m
+RuleID:      curl-auth-user
+Entropy:     3.734522
+File:        aire-workflow/templates/ci/agentic-eval-pipeline.yml.template
+Line:        312
+Fingerprint: aire-workflow/templates/ci/agentic-eval-pipeline.yml.template:curl-auth-user:312
+
+[90m5:23PM[0m [32mINF[0m [1mscanned ~2455530 bytes (2.46 MB) in 380ms[0m
+[90m5:23PM[0m [33mWRN[0m [1mleaks found: 4[0m
+exit=0

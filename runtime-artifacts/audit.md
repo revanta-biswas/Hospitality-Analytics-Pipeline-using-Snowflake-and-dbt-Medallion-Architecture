@@ -473,3 +473,150 @@ workflow will not proceed to Code Generation until the user types `dev-implement
 **Context**: Story Selection + Doability Gate, dev-implement Step 2/3
 
 ---
+
+**Timestamp**: 2026-09-14T12:06:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.1 - Story branch cut; baseline capture started; code generation delegated
+**TRACKER ITEM**: "[Story 1.1: Replace inline AWS credentials with a Snowflake Storage Integration](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline (Security & Data Quality)](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Cut story/1.1-replace-inline-aws-credentials-storage-integration from the epic branch (dependency-merge check trivially passed - no requires). Recorded baseline-regression.log noting no test suite exists yet in this repo (expected for the epic's first story). Delegated Part 1 Planning + Part 2 Generation to a background agent: writing the code-generation plan file, the story's Gherkin behavior spec (spec/behavior/story-1.1.feature), the actual SQL edits (Stage.sql Storage Integration + Copy_Into.sql credential removal), real pytest-bdd step definitions that statically verify the SQL text (since no live Snowflake account exists to test against), and the post-change static eval diff. Code Review, Remediate, and PR raising are explicitly out of scope for the delegated task - reserved for this session to run directly per dev-implement.md Section A onward."
+**Context**: Code Generation Part 1/2, dev-implement Steps 3.5-6.6
+
+---
+
+## Code Generation Part 1 — Plan Finalized (auto-approved, no gate) (Story 1.1)
+**Timestamp**: 2026-09-15T10:55:10Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**TRACKER ITEM**: "[Story 1.1: Replace inline AWS credentials with a Snowflake Storage Integration](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline (Security & Data Quality)](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Read requirements.md (REQ-F-01, REQ-NF-01, REQ-NF-02 full text), architecture.md
+ARCH-01, and atlas-deep-dive.md Flow 1 (Raw Ingestion) per this delegated task's instructions. Wrote
+the complete code-generation plan to spec/spec-generation/story-1.1-code-generation.md (10 numbered
+steps, checkboxes, REQ/AC trace summary). Trace completeness self-check: REQ-F-01/REQ-NF-01/REQ-NF-02
+and AC-1..AC-4 all appear in >=1 tagged step — PASS. Design reference grounding: none applies (no
+UI/API prototype for Snowflake bootstrap SQL). API & Contract Testing Gate: N/A, no API layer in this
+story's plan. Plan auto-approved and executed immediately per dev-implement.md (no plan-approval gate
+exists in this workflow)."
+**Context**: Code Generation Part 1, code-generation.md Steps 1-6
+
+---
+
+## Baseline Static Eval Capture (Story 1.1)
+**Timestamp**: 2026-09-15T10:55:10Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**TRACKER ITEM**: "[Story 1.1: Replace inline AWS credentials with a Snowflake Storage Integration](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline (Security & Data Quality)](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Ran D1-D7 on the story branch BEFORE any SQL edit, per dev-implement.md Step 1.5 Item
+4.6. Confirmed no new bootstrap config was needed (ruff/mypy/semgrep/pip-audit/pip-licenses/radon/
+gitleaks all ran with recommended defaults, no .gitleaks.toml/.semgrepignore required). Results: D1
+ruff PASS (0 .py files under sourcePaths — real tool-verified zero-file result, not fabricated N/A),
+D2 mypy PASS (0 .py[i] files), D3 semgrep PASS (0 findings, 82 rules/36 files), D4 pip-audit PASS (0
+vulns), D5 pip-licenses PASS (0 disallowed licences), D6 radon PASS (0 .py files), D7 gitleaks: 4
+pre-existing findings, all curl-auth-user matches on ${SONAR_TOKEN} in
+.github/workflows/agentic-eval-pipeline.yml and aire-workflow/templates/ci/agentic-eval-pipeline.yml.template
+— none inside src/snowflake/, recorded as pre-existing debt per eval-framework.md Section 2.2, not
+fixed, not blocked on. Saved to reports/eval-evidence/story-1.1/static/baseline/ (raw logs + baseline-summary.md)."
+**Context**: dev-implement.md Step 1.5 Item 4.6 (baseline static eval)
+
+---
+
+## Behaviour Spec Written (Story 1.1)
+**Timestamp**: 2026-09-15T10:55:10Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**TRACKER ITEM**: "[Story 1.1: Replace inline AWS credentials with a Snowflake Storage Integration](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline (Security & Data Quality)](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Wrote spec/behavior/story-1.1.feature BEFORE any SQL edit, per common/behavior-spec.md
+Section 2. 4 scenarios, one per acceptance criterion (@AC-1..@AC-4), covering: Stage.sql Storage
+Integration + stage binding, Copy_Into.sql credential-clause removal, repo-wide zero-match search for
+aws_key_id/aws_secret_key, and static-parseability without a live account (REQ-NF-02)."
+**Context**: Code Generation Part 2 Step 4.5, dev-implement.md
+
+---
+
+## SQL Edits Applied (Story 1.1)
+**Timestamp**: 2026-09-15T10:55:10Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**TRACKER ITEM**: "[Story 1.1: Replace inline AWS credentials with a Snowflake Storage Integration](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline (Security & Data Quality)](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Modified src/snowflake/Stage.sql in-place: added `CREATE STORAGE INTEGRATION IF NOT
+EXISTS s3_int` (TYPE=EXTERNAL_STAGE, STORAGE_PROVIDER='S3', placeholder STORAGE_AWS_ROLE_ARN and
+STORAGE_ALLOWED_LOCATIONS, documented as operator-supplied before live use), and rebound `s3_stage`'s
+CREATE OR REPLACE STAGE DDL to `STORAGE_INTEGRATION = s3_int` in place of any credential clause (none
+had existed on the stage itself — the leak was entirely in Copy_Into.sql). Modified
+src/snowflake/Copy_Into.sql in-place: removed the `CREDENTIALS=(aws_key_id = 'yourkey', aws_secret_key
+= 'yoursecretkey')` clause from all three COPY INTO statements (BOOKINGS, HOSTS, LISTINGS) — they now
+inherit auth from the stage's storage integration. Mechanically verified AC-3:
+`grep -rn 'aws_key_id\|aws_secret_key\|credentials=' src/snowflake/*.sql` (case-insensitive) returned
+ZERO MATCHES."
+**Context**: Code Generation Part 2 Step 11 (Steps 3-5 of the story plan), REQ-F-01/REQ-NF-01, AC-1/AC-2/AC-3
+
+---
+
+## Behavioural Test Gate — B1 (Story 1.1)
+**Timestamp**: 2026-09-15T10:55:10Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**TRACKER ITEM**: "[Story 1.1: Replace inline AWS credentials with a Snowflake Storage Integration](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline (Security & Data Quality)](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Implemented real pytest-bdd step definitions in tests/behavior/steps/stage_credential_steps.py
+(bound via tests/behavior/conftest.py, runner tests/behavior/test_story_1_1.py), asserting directly on
+the SQL file text/structure — no live Snowflake/AWS connection opened anywhere in this module, per
+REQ-NF-02. Ran `python3 -m pytest tests/behavior/ -v --tb=short --junitxml=.../behavior-test-report.xml`
+— RESULT: 4 passed, 0 failed, every @AC-n tag (AC-1..AC-4) executed and green. Evidence saved to
+reports/behavior-test-evidence/story-1.1/b1/ (behavior-test-run.log, behavior-test-report.xml,
+evidence-manifest.md). HONEST EXCEPTION recorded in the evidence manifest: these tests ran natively
+via pytest, NOT inside the common/behavior-spec.md Section 5 Podman-sandboxed run.sh <tier> gate — that
+full B1/B2/B3 tiered gate (including Podman) is explicitly reserved for the invoking session per this
+delegated task's scope, along with Code Review/Remediate/PR. Added pytest, pytest-bdd and sqlparse as
+declared [dependency-groups] dev dependencies in pyproject.toml (sqlparse was not previously installed;
+installed via `pip3 install --break-system-packages sqlparse` in this environment)."
+**Context**: Code Generation Part 2 Step 11 (Steps 6-8 of the story plan) / code-generation.md Step 11a
+adapted for a SQL-only story per this task's explicit instructions; unitCoverage recorded N/A (0 .py
+application code changed)
+
+---
+
+## Static Eval Gate D1-D7 — Post-Change Diff (Story 1.1)
+**Timestamp**: 2026-09-15T10:55:10Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**TRACKER ITEM**: "[Story 1.1: Replace inline AWS credentials with a Snowflake Storage Integration](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline (Security & Data Quality)](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Re-ran D1-D7 after the SQL edits and diffed against the Step 1.5 baseline
+(reports/eval-evidence/story-1.1/static/baseline/). D1/D2/D6: identical (0 .py files, both runs). D3
+semgrep: 0 findings both runs. D4 pip-audit: 0 vulns both runs. D5 pip-licenses: 0 disallowed licences
+both runs. D7 gitleaks: same 4 pre-existing findings, confirmed BYTE-IDENTICAL by Fingerprint field
+comparison (never line number, per eval-framework.md Section 2.2) between baseline and post-change JSON
+reports — ZERO NEW findings on this story's changed files (src/snowflake/Stage.sql,
+src/snowflake/Copy_Into.sql). Wrote reports/eval-evidence/story-1.1/eval.json and eval-summary.md.
+Verdict: PASS (8 of 10 declared checks ran with a real result; unitCoverage and apiContract N/A for the
+stated, closed-list reasons). J1/J2 judge gates and Code Review are explicitly NOT computed here —
+reserved for the invoking session."
+**Context**: Code Generation Part 2 Step 11c (Step 9 of the story plan)
+
+---
+
+## Code Generation Complete — Delegated Scope (Story 1.1)
+**Timestamp**: 2026-09-15T10:55:10Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**TRACKER ITEM**: "[Story 1.1: Replace inline AWS credentials with a Snowflake Storage Integration](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline (Security & Data Quality)](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Files created/modified this pass: src/snowflake/Stage.sql (modified — STORAGE
+INTEGRATION added, stage rebound), src/snowflake/Copy_Into.sql (modified — credential clauses removed),
+spec/spec-generation/story-1.1-code-generation.md (created), spec/behavior/story-1.1.feature (created),
+tests/behavior/test_story_1_1.py + tests/behavior/conftest.py + tests/behavior/steps/stage_credential_steps.py
+(created), pyproject.toml (modified — added [dependency-groups] dev), reports/eval-evidence/story-1.1/**
+and reports/behavior-test-evidence/story-1.1/b1/** (created — evidence). All 4 behavioural scenarios
+pass; static eval diff is clean (zero new findings). Story stays 'In Development' — this delegated pass
+does NOT run Code Review, Remediate, raise a PR, or compute J1/J2; those are explicitly reserved for
+the invoking session per its instructions, to be run directly per dev-implement.md Section A onward.
+Committing this work on story/1.1-replace-inline-aws-credentials-storage-integration; not pushing."
+**Context**: Code Generation Part 2 complete (delegated scope only)
+
+---

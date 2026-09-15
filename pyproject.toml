@@ -8,3 +8,10 @@ dependencies = [
     "dbt-core>=1.11.7",
     "dbt-snowflake>=1.11.3",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-bdd>=8.0.0",
+    "sqlparse>=0.5.0",
+]

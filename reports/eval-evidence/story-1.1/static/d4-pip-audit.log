@@ -1,0 +1,2 @@
+=== D4 pip-audit ===
+}, {"name": "urllib3", "version": "2.7.0", "vulns": []}, {"name": "uvicorn", "version": "0.52.4", "vulns": []}, {"name": "uvloop", "version": "0.22.1", "vulns": []}, {"name": "watchfiles", "version": "1.2.0", "vulns": []}, {"name": "wcwidth", "version": "0.8.3", "vulns": []}, {"name": "websockets", "version": "17.1", "vulns": []}, {"name": "wheel", "version": "0.47.0", "vulns": []}], "fixes": []}

@@ -889,3 +889,24 @@ combinations (1.1 B1/B2, 1.2 B1/B2) - all pass with correct scenario counts (1.1
 **Context**: PR #12 conflict resolution, dev-implement branch hygiene
 
 ---
+
+## Story Selection — Story 1.3
+**Timestamp**: 2026-09-16T10:55:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "1.3 - core data integrity tests (Recommended)"
+**TRACKER ITEM**: "[Story 1.3: Add core data integrity tests (uniqueness, not-null, referential integrity)](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/3)"
+**Epic Link**: "[Epic: Harden Pipeline (Security & Data Quality)](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Resolved Story 1.3 (issue #3) matching stories.md. Doability Gate: requires=[] per
+dependency-graph.yml - doable immediately. Transitioned GitHub label status:ready-for-dev ->
+status:in-development, assigned to revanta-biswas, posted claim comment. Verified via gh issue view.
+Cut story/1.3-core-data-integrity-tests explicitly from origin/epic/harden-pipeline-security-and-data-quality
+(learning from the earlier Story 1.2 branch-cut mistake - used an explicit remote-ref checkout this
+time instead of relying on the current local checkout state). Merge-base confirmed to match HEAD
+exactly, picking up both #11 and #12's now-merged commits. Also corrected the Story Tracker rows for
+1.1 and 1.2 - both PRs have now actually merged (verified via gh pr view), so Merged column updated
+to yes for both; Status stays In Development per AIRE rules until ve-list-work signs each off.
+Story Tracker updated: 1.3 Status -> In Development, Start=2026-09-16."
+**Context**: Story Selection + Doability Gate, dev-implement Step 2/3
+
+---

@@ -200,6 +200,48 @@ jobs:
           done
           exit "$step_fail"
 
+      # 🔴 TRUST GATE, not first execution — this re-runs the SAME specs the local Playwright UI
+      #    Automation Gate already generated, ran `--headed`, and remediated
+      #    (implementation/code-generation.md Step 11d). The ONLY difference is the display mode: this
+      #    runs headless because a GitHub runner has no display — never because headless is a policy.
+      #    CI never runs the Planner/Generator/Healer; it only proves the same pass reproduces in a
+      #    clean environment. N/A when `ci.playwright` is absent or `enabled` is not `true`
+      #    (common/ci-pipeline-generation.md Section 3.0f) — never a guessed start command.
+      - name: "Stage 2: playwright e2e (headless, trust gate)"
+        id: playwright
+        continue-on-error: true
+        run: |
+          mkdir -p tests/.evals/_run
+          enabled="$(jq -r '.playwright.enabled // false' tests/.evals/config.json 2>/dev/null)"
+          if [ "$enabled" != "true" ]; then
+            echo "N/A" > tests/.evals/_run/playwright.status
+            echo "::notice::Playwright trust gate skipped - ci.playwright.enabled is not true."
+            exit 0
+          fi
+          start_cmd="$(jq -r '.playwright.startCommand // empty' tests/.evals/config.json)"
+          ready_url="$(jq -r '.playwright.readinessUrl // empty' tests/.evals/config.json)"
+          test_cmd="$(jq -r '.playwright.testCommand // "npx playwright test tests/e2e/"' tests/.evals/config.json)"
+          if [ -z "$start_cmd" ] || [ -z "$ready_url" ]; then
+            echo "FAIL" > tests/.evals/_run/playwright.status
+            echo "::error::ci.playwright.enabled is true but startCommand/readinessUrl are unresolved — this is a manifest defect, not an N/A."
+            exit 1
+          fi
+          npx playwright install --with-deps
+          # Start the app in the background exactly as the local gate does, then wait for readiness.
+          eval "$start_cmd" &
+          server_pid=$!
+          npx --yes wait-on "$ready_url" --timeout 60000
+          trc=0
+          eval "$test_cmd --reporter=line,json:tests/.evals/_run/playwright-report.json" || trc=$?
+          kill "$server_pid" 2>/dev/null || true
+          wait "$server_pid" 2>/dev/null || true
+          if [ "$trc" -eq 0 ]; then
+            echo "PASS" > tests/.evals/_run/playwright.status
+          else
+            echo "FAIL" > tests/.evals/_run/playwright.status
+          fi
+          exit "$trc"
+
       # 🔴 run-evals.sh's OWN precondition check (`command -v claude`) fails the judge gate outright if
       #    this is missing — the self-repair job installs the CLI for ITSELF, later, only on failure;
       #    that install never reaches this job. Without this step, J1/J2 fail on every single PR before
@@ -330,6 +372,7 @@ ${SONAR_STEPS}
                    "unit:${{ steps.unit.outcome }}" \
                    "coverage:${{ steps.coverage.outcome }}" \
                    "behavior:${{ steps.behavior.outcome }}" \
+                   "playwright:${{ steps.playwright.outcome }}" \
                    "judge:${{ steps.judge.outcome }}" \
                    "sonar:${{ steps.sonarqg.outcome }}"; do
             name="${r%%:*}"; outcome="${r##*:}"

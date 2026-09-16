@@ -16,7 +16,7 @@ one of them. Nothing AIRE writes goes anywhere else.
 | Root         | Holds                                                                                                                                                                                                    | Rule                                                       |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | `src/`     | **ALL application source code**| Greenfield AND brownfield. Never code outside it.          |
-| `tests/`   | All test code:`tests/unit/`, `tests/behavior/` (Gherkin), `tests/e2e/` (Playwright); plus the eval framework at **`tests/.evals/`** (thresholds, rubrics, eval runner scripts) | Mirrors`src/` structure under `tests/unit/`. `tests/.evals/` is the source of truth for WHETHER it built it right. |
+| `tests/`   | All test code:`tests/unit/`, `tests/api/` (API & contract tests), `tests/behavior/` (Gherkin), `tests/e2e/` (Playwright); plus the eval framework at **`tests/.evals/`** (thresholds, rubrics, eval runner scripts) | Mirrors`src/` structure under `tests/unit/`. `tests/.evals/` is the source of truth for WHETHER it built it right. |
 | `spec/`    | The specs AIRE writes and the docs AIRE writes — `plans/`, `spec-generation/`, `behavior/`, `test-plans/`, `behavior.feature`, `context-project/` | The agent's source of truth for WHAT to build.             |
 | `reports/` | **Generated OUTPUTS** — test/eval evidence (unit, behavior, api-contract, eval), review reports (`reviews/`, `code-security-reviews/`) and per-work-unit code summaries (`ticket-summary/`) | Generated proof/findings/summaries only; never a spec.     |
 | `runtime-artifacts/` | The cycle's **`audit.md`** (audit trail) and **`aire-state.md`** (session/state), alongside root-level tool caches (`.mypy_cache`, `.ruff_cache`, Playwright exec files) | Session/run state + tool artifacts; recreated fresh each cycle. |
@@ -35,10 +35,25 @@ this specific project** (see `common/ci-pipeline-generation.md`).
 │   └── [stack-idiomatic structure]       #    layout per code-generation.md; NEVER outside src/
 │
 ├── tests/                                 #   ALL TEST CODE — never under spec/
-│   ├── unit/                              #    Unit tests — MIRRORS src/ layout 1:1
+│   ├── unit/                              #    ALL unit tests — MIRRORS src/ layout 1:1. HARD RULE:
+│   │   │                                 #    every unit test (incl. UI/component tests — RTL, jsdom,
+│   │   │                                 #    Enzyme, etc.) lives here, never in a sibling top-level
+│   │   │                                 #    folder like tests/components/. Grouped/baseline suites
+│   │   │                                 #    that cover several src/ modules together still nest
+│   │   │                                 #    under the mirrored path of the area they cover (e.g. a
+│   │   │                                 #    components baseline suite → tests/unit/components/) —
+│   │   │                                 #    "mirrors src/" governs the PARENT path, it does not
+│   │   │                                 #    require one file per source file.
 │   │   └── <mirror-of-src>/               #    e.g. src/auth/login.ts → tests/unit/auth/login.test.ts
 │   │                                     #    one test module per src module (jest / pytest /
 │   │                                     #    go test / JUnit); feeds D-coverage + unit evidence
+│   ├── api/                               #    API & Contract Testing Gate output (code-generation.md
+│   │   │                                 #    Step 11a.5) — tests that call REAL endpoints (supertest /
+│   │   │                                 #    httpx / RestAssured / MockMvc / a spun-up test server).
+│   │   │                                 #    HARD RULE: this is the ONLY location for these tests —
+│   │   │                                 #    never tests/unit/, never colocated with the endpoint's
+│   │   │                                 #    unit tests. Not a mirror of src/ — organize per endpoint
+│   │   │                                 #    or resource group (e.g. tests/api/articles.route.test.js).
 │   ├── behavior/                          #  Gherkin EXECUTION layer (the .feature SPECS live in spec/)
 │   │   ├── test_<work-unit>.py            #    loader/runner — points the BDD runner (behave/
 │   │   │                                 #    pytest-bdd/cucumber) at spec/behavior/<work-unit>.feature
@@ -180,6 +195,25 @@ this specific project** (see `common/ci-pipeline-generation.md`).
    story only creates something that can drift.
 4. **Test code lives in `tests/`, never in `src/`** unless the stack's own convention is co-location
    (Go `_test.go`, Rust `#[cfg(test)]`), in which case follow the stack.
+   4a. 🔴 **HARD RULE — ALL unit tests live under `tests/unit/`, with no exceptions and no sibling
+   folders.** This includes UI/component tests (RTL, jsdom, Enzyme, Vue Test Utils, etc.) — a
+   component-testing baseline or guard-test suite is still a unit test and nests under the mirrored
+   `tests/unit/<area>/` path (e.g. `tests/unit/components/`), never a new top-level folder such as
+   `tests/components/`. "Mirrors `src/`" constrains the *parent path*, not the file count — a suite
+   that intentionally covers many `src/` modules together (a baseline/guard suite) is still placed at
+   the mirrored path for the area it covers, not exempted into a new root-level folder for being
+   grouped. There is no ambiguity to resolve here at generation time: if it is a unit test, it goes in
+   `tests/unit/`.
+   4b. 🔴 **HARD RULE — API & Contract Testing Gate output (`code-generation.md` Step 11a.5) lives
+   ONLY in `tests/api/`.** These are not unit tests (Step 11a) — they call real endpoints — so they
+   never go in `tests/unit/`, and they never get created ad hoc at another path. Organize by endpoint
+   or resource group, not mirrored 1:1 from `src/`.
+   4c. 🔴 **Rules 4a/4b are mechanically enforced, not merely narrated.** The **Test Placement
+   Verification Gate** (`code-generation.md` Step 11a.6, `SH-LOOP-12` in `workflows/dev-implement.md`
+   Step 6.3) runs `tests/.evals/scripts/check-test-placement.*` — a deterministic script, generated
+   once per project per `common/ci-pipeline-generation.md` Section 4.0.7 — against this story's diff on
+   every `dev-implement` run, and CI re-runs the same script on every PR. A misplaced test file is a
+   gate failure, capped at 3 self-healing attempts, never a silent drift left for a later cleanup.
 5. **Generated outputs are not specifications.** Raw tool output and review reports go under the
    top-level `reports/` root (`reports/unit-test-evidence/`, `reports/behavior-test-evidence/`,
    `reports/api-contract-test-evidence/`, `reports/eval-evidence/`, `reports/reviews/`,

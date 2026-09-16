@@ -20,6 +20,14 @@ description: >
   tooling, so backend/API manual test cases stay manual-only, always. Additive only -- never modifies
   /ve-implement's manual, black-box test steps, and never touches Story Tracker or tracker status.
   Only runs when the Playwright Test Automation extension is opted into during Requirements Analysis.
+  TWO MODES: STANDALONE (the user types /playwright-implement — everything above applies as written,
+  post-merge, with the both-merges gate, the Approval Gate and the Push Gate), and WORKFLOW (invoked as
+  a step by dev-implement / bug-fix-implement / enhancement-implement with mode: workflow and the story
+  passed in — pre-PR, on the work unit's own branch: the story-picker, the both-merges gate, the branch
+  checkout, the Approval Gate and the Push Gate are all SKIPPED, the seed auto-derives, the app is
+  started and torn down by the skill itself, and the generated artifacts ride the caller's own commit).
+  Execution is --headed in BOTH modes — it is the developer's own machine, and headless belongs to CI
+  alone, where a runner has no display. Skipping approvals never skips verification.
 when_to_use: >
   Trigger when the user says: "/playwright-implement 1.2", "/playwright-implement AT-898",
   "/playwright-implement", "automate this story's tests", "generate playwright scripts for story 1.2",
@@ -42,5 +50,14 @@ That file in turn loads and executes:
 aire-workflow/extensions/testing/playwright-automation/playwright-automation.md
 ```
 
-Read both completely and follow every step defined in them, in order. Do not skip the Prerequisite
-Gate (Step 0) or the Approval Gate (Step 2/6) under any circumstance.
+Read both completely and follow every step defined in them, in order.
+
+🔴 **FIRST resolve the mode** (`playwright-implement-agent.md` → **Mode Detection**):
+- **STANDALONE** (the user typed the trigger) — never skip the Prerequisite Gate (Step 0), the
+  both-merges gate (Step 2a), the Approval Gate (Step 2/7) or the Push Gate (Step 12).
+- **WORKFLOW** (`mode: workflow`, invoked by `dev-implement` / `bug-fix-implement` /
+  `enhancement-implement` with the story passed in) — the Mode Detection table governs: approvals,
+  the both-merges gate, the branch checkout and the push are skipped; the Prerequisite Gate, the real
+  Planner/Generator/Healer subagents and the actual `--headed` test run all still happen.
+
+🔴 The Prerequisite Gate (Step 0) is never skipped in **either** mode.

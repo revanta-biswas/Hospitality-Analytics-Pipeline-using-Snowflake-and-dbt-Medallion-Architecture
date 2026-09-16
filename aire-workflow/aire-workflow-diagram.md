@@ -1099,7 +1099,19 @@ Each skill resolves the correct branch from the project state file and announces
 
 ### `/playwright-implement &lt;TICKET-ID&gt;` — turn the approved manual UI steps into automation
 
-**When to use it.** Once a story's manual UI test steps exist and **both** of that story's pull requests have merged into the integration branch. This is a downstream, optional step — never a substitute for `/ve-implement`, and never run before those two merges.
+> 🔴 **Note — this skill now has TWO modes, and the automatic one is the primary path.**
+> Everything described below is **STANDALONE MODE**: you type the trigger yourself, post-merge.
+> A story that goes through `dev-implement` (or a ticket through `bug-fix-implement` /
+> `enhancement-implement`) and **touches UI** already had this run automatically, **pre-PR**, inside
+> that workflow's **Playwright UI Automation Gate** — which invokes the `ve-implement` and
+> `playwright-implement` skills in **WORKFLOW MODE** (story passed in; story-picker, both-merges gate,
+> branch checkout, plan Approval Gate and Push Gate all skipped; app started locally by the skill;
+> executed **headed**, exactly as standalone; failures remediated before code review; CI later re-runs
+> the same specs as a trust gate, headless only because a runner has no display).
+> Standalone mode below remains for a story the gate skipped (no UI at plan time, later found to need
+> it) or for re-automation after the fact.
+
+**When to use it (standalone).** Once a story's manual UI test steps exist and **both** of that story's pull requests have merged into the integration branch. This is a downstream, optional step — never a substitute for `/ve-implement`, and never run before those two merges.
 
 **The sequence, in order:**
 

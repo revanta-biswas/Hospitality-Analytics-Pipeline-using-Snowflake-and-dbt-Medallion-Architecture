@@ -63,6 +63,13 @@ newer template introduced. The repo's own file wins.
     "enabled": false,
     "_comment": "Set true when CI generation creates sonar-project.properties and the user answers proceed at the setup gate. Additive to semgrep, never a replacement."
   },
+  "playwright": {
+    "enabled": false,
+    "startCommand": null,
+    "readinessUrl": null,
+    "testCommand": "npx playwright test tests/e2e/",
+    "_comment": "Set true, with startCommand/readinessUrl resolved and testCommand adjusted if needed, the first time a work unit's manifest fragment (implementation/code-generation.md Step 11d) runs the Playwright UI Automation Gate for real. 🔴 testCommand is stored WITHOUT a display flag: the local gate appends --headed (developer's own machine), and CI deliberately appends nothing because a runner has no display. CI's own Playwright step re-executes THIS SAME command set as a trust gate — never the first execution. N/A (not false) when the project genuinely has no UI at all."
+  },
   "judge": { "model": "<resolved session model id>", "rubricVersion": "<architecture.md version>" },
   "ci": {
     "baseBranch": "main",
@@ -94,6 +101,7 @@ newer template introduced. The repo's own file wins.
     ],
     "gates": ["D1_lint", "D2_types", "D3_sast", "D4_deps", "D5_licenses", "D6_complexity", "D7_secrets",
               "unitCoverage", "behaviorB1", "behaviorB2", "behaviorB3", "J1_architecture", "J2_security"],
+    "_gatesComment": "🔴 'playwright' is appended here at generation time only once `playwright.enabled` is true (mirrors 'sonarqube's own append-on-enable rule) — never present for a project with no UI at all.",
     "_rootsComment": "🔴 noTestsExitCode is the exit status THIS root's test runner returns when it collects ZERO tests (pytest 5; jest/vitest 1 — prefer adding --passWithNoTests to the command instead; go/maven/gradle/dotnet exit 0 and omit the field). ci-manifest-runner.* records that exit as N/A rather than FAIL, because 'no suite exists yet' is the correct state of a greenfield repo before its first story and of a brownfield repo with no tests — NOT something to self-repair by writing dummy tests. It cannot hide a missing test: coverage_delta() still enforces unitTestCoverageMin on the CHANGED files and records ERROR when one has no coverage data. See ci-pipeline-generation.md Section 3.0.",
     "_comment": "🔴 CI SINGLE SOURCE OF TRUTH. The generated pipeline AND every local step read THIS block — neither one re-authors or independently re-derives any of these facts, `root` included. See ci-pipeline-generation.md Section 4 and Section 4.0d."
   }
@@ -644,6 +652,7 @@ audited amendment. Not to remove the gate.
 | Behavioural **B2** — cumulative (every other feature file) | SH-LOOP-7 | 2 |  |
 | Behavioural **B3** — epic scope (last work unit only) | SH-LOOP-8 | 2 (epic PR) |  |
 | API & contract | SH-LOOP-2 | **local only** |  (when applicable) |
+| Playwright UI automation | SH-LOOP-11 | 2 (trust gate — re-executes, never originates) |  (when applicable) |
 | Full regression | SH-LOOP-3 | **local only** |  |
 | J1 architecture | SH-LOOP-6 | 3 |  (unless `N/A`) |
 | J2 security (OWASP) | SH-LOOP-6 | 3 |  |
@@ -661,6 +670,17 @@ Two consequences follow, and both are intentional:
   touched root's full test command, so a break is still caught. What CI has no equivalent of is the
   **baseline diff** that separates "this work unit broke it" from "it was already red" — that
   attribution exists only in the local gate.
+
+🔴 **`playwright` is deliberately NOT local-only — it is the one gate CI genuinely re-executes.** The
+local run (`implementation/code-generation.md` Step 11d) is the FIRST execution and the only one that
+remediates — and it runs **`--headed` on the developer's machine**, exactly as the standalone skill
+always has. CI's copy (`common/ci-pipeline-generation.md` Section 4) re-runs the **same specs** as a
+**trust gate** — headless only because a GitHub runner has no display, never as a policy choice —
+proving the same result reproduces in a clean environment, never originating new coverage and never
+re-opening remediation on its own. A CI-only Playwright failure on
+a gate that passed locally is a CI provisioning/manifest defect (missing browsers, wrong start
+command, wrong readiness URL) — triaged exactly like every other local-vs-CI mismatch, never grounds
+to re-litigate the local result.
 
 #### 2.5.5 🔴 THE STATUS VOCABULARY IS CLOSED — `PASS` · `FAIL` · `ERROR` · `N/A`
 
@@ -737,6 +757,8 @@ gate's failure is never offset by another's success.
     "behaviorB2":    { "status": "PASS", "scenarios": "48/48", "featureFiles": 4 },
     "behaviorB3":    { "status": "N/A",  "reason": "not the last work unit — 2 stories still open (1.4, 1.5)" },
     "apiContract":    { "status": "PASS", "endpoints": 3 },
+    "playwright":     { "status": "PASS", "scenarios": "6/6", "headed": true,
+                        "reExecutedInCI": true },
     "regression":     { "status": "PASS", "newFailures": 0 },
     "J1_architecture":{ "status": "PASS", "score": 0.91, "min": 0.85,
                         "rubricSource": "architecture.md#10",
@@ -794,6 +816,7 @@ match this table exactly.
 | Behavioural B2 (cumulative) | 48/48 scenarios · 4 feature files | 100% |  PASS |
 | Behavioural B3 (epic scope) | not the last story — 1.4, 1.5 still open | last unit only | ⚪ N/A |
 | API & contract | 3/3 endpoints | all applicable |  PASS |
+| Playwright UI automation | 6/6 scenarios · re-executed in CI | 100% |  PASS |
 | Regression | 0 new failures | 0 |  PASS |
 | J1 Architecture | 0.91 | ≥ 0.85 |  PASS |
 | J2 Security (OWASP 2025) | 0.92 | ≥ 0.85 |  PASS |
@@ -821,11 +844,11 @@ truth; the claim is not.
 
 ## 7. Where this file is invoked
 
-| Flow | Bootstrap + baseline D1–D7 | Static Eval Gate | J1 + J2 | Rubric derivation |
-|---|---|---|---|---|
-| `dev-implement` | Step 1.5 Item 4.6 | Step 6.6 | Section A Auto Code Review (blocking) | STOP CHECKPOINT, from `architecture.md` Section 10 |
-| `bug-fix-implement` | Step 3 Item 5 | Step 7.5 | Step 8a (blocking) | Fallback chain Section 3 |
-| `enhancement-implement` | Step 10 | Step 14.5 | Step 15a (blocking) | Fallback chain Section 3 |
+| Flow | Bootstrap + baseline D1–D7 | Static Eval Gate | Playwright UI Automation (SH-LOOP-11, when applicable) | J1 + J2 | Rubric derivation |
+|---|---|---|---|---|---|
+| `dev-implement` | Step 1.5 Item 4.6 | Step 6.6 | Step 6.7 | Section A Auto Code Review (blocking) | STOP CHECKPOINT, from `architecture.md` Section 10 |
+| `bug-fix-implement` | Step 3 Item 5 | Step 7.5 | Step 7.7 | Step 8a (blocking) | Fallback chain Section 3 |
+| `enhancement-implement` | Step 10 | Step 14.5 | Step 14.7 | Step 15a (blocking) | Fallback chain Section 3 |
 | `code-review` standalone | — | — | Recomputed and reported for the scope reviewed | — |
 | **CI pipeline** | — (runs on a clean checkout) | Stage 1 | Stage 3 (blocking) | — (reads the committed rubric) |
 

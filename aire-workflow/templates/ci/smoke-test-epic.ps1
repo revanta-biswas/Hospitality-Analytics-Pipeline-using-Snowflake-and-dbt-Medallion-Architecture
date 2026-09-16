@@ -124,6 +124,20 @@ if ($passed) {
   ReportBreakdown "PASS"
   NoteMsg "merging $prUrl into $EpicBranch and deleting $scratchBranch"
 
+  # The PR was opened --draft above. GitHub refuses to merge a draft PR under ANY circumstance -
+  # --admin bypasses branch-protection rules, not draft state - so the merge below would fail 100%
+  # of the time without first marking it ready for review. This is a zero-diff, already-passing,
+  # machine-authored scratch PR with no reviewer expectation, so undrafting it here is part of the
+  # same already-authorized "merge on green" action (Section 4.0.6 item 4), not a new decision -
+  # never confirm this with the user.
+  gh pr ready $prNumber 2>$null
+  $readyExit = $LASTEXITCODE
+  if ($readyExit -ne 0) {
+    Fail "smoke test passed but marking $prUrl ready for review failed"
+    exit 1
+  }
+  NoteMsg "PR marked ready for review"
+
   # Attempt auto-merge with --merge flag first
   # If that fails, try with --admin flag to force merge (safe for zero-diff smoke test)
   gh pr merge $prNumber --merge --delete-branch 2>$null

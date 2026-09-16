@@ -93,6 +93,32 @@ Log the question and the complete raw answer in `runtime-artifacts/audit.md`. Th
 
 **Monorepo note**: Reverse engineering artifacts are always checked/generated at the workspace ROOT only — one artifact set covering all modules. Never look for or create per-module artifact sets (see `planning/reverse-engineering.md` "Monorepo Handling").
 
+## Step 3.5: Source Code Location Advisory (Brownfield only)
+
+**Skip entirely on resume** (if `runtime-artifacts/aire-state.md` already exists from a prior run of this cycle) — do NOT show this advisory again.
+
+Applies only when `brownfield = true` (Step 3). On greenfield, skip silently.
+
+1. Check whether the existing source code found in Step 2 already resides under `src/` at the repository root.
+2. **IF it already resides under `src/`**: continue silently to Step 4 — no message.
+3. **IF it does not**: display the advisory below verbatim, then **HALT and wait for the user**. Do NOT proceed to Step 4 on your own.
+
+```markdown
+## Source Code Location
+
+This project's existing source code is not located in `src/` at the repository root. AIRE writes all
+newly generated code into `src/`. Restructure the existing codebase so that all source code resides
+under `src/`.
+
+This restructuring is not performed automatically
+
+Once the restructuring is complete, type `continue` to proceed.
+```
+
+4. **Wait for the user to type `continue`** before moving to Step 4.
+
+Log the message, the detected location, and the user's confirmation in `runtime-artifacts/audit.md`.
+
 ## Step 4: Create Initial State File
 
 Create `runtime-artifacts/aire-state.md`:

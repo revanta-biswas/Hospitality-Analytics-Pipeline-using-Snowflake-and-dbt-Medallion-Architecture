@@ -17,6 +17,39 @@ for, or touch the **dev's** branch, PR, or merge state.
 
 ---
 
+## Mode Detection (do this FIRST — decides which steps run)
+
+This agent runs in one of **two modes**. Resolve the mode before anything else — it changes which
+steps execute, and getting it wrong is destructive (a branch cut mid-`dev-implement` orphans the work
+unit's uncommitted code).
+
+- **STANDALONE MODE** — the default. ve typed `/ve-implement …` themselves. Run **every** step below
+  exactly as written, including the story-picker (Step 2), the `ve/…` branch (Step 3), the
+  Approve/Request-Changes checkpoint (Step 6 / `test-plan.md` Step 6), and the push + PR (Step 5).
+
+- **WORKFLOW MODE** — invoked as a step by `dev-implement` / `bug-fix-implement` /
+  `enhancement-implement` (their Playwright UI Automation Gate — `implementation/code-generation.md`
+  Step 11d), with the story/ticket **passed in** and `mode: workflow`. The invoking workflow has no
+  approval gates and is already mid-run on the work unit's own branch, so:
+
+  | Step | WORKFLOW MODE behaviour |
+  |---|---|
+  | **Step 2 — Resolve the target story** | 🔴 **SKIPPED.** The story is passed in. Never present the story-picker table; never ask. If the folder already exists, reuse it — do NOT ask refresh-or-stop; the caller already decided (it only invokes this skill when the content is absent). |
+  | **Step 3 — Resolve branch + cut `ve/…`** | 🔴 **SKIPPED ENTIRELY.** Stay on the branch you were invoked on (the story/bug/enhancement branch). **Never `git checkout`, never cut a branch, never pull** — the caller's uncommitted work is in this tree. |
+  | **Step 4 — Generate the artifacts** | ▶ **RUNS IN FULL**, with two carve-outs inside `test-plan.md`: its **Step 2 applicability confirmation is auto-confirmed** (announce the applicability table, do not wait), and its **Step 6 Approve/Request-Changes checkpoint is SKIPPED**. |
+  | **Step 5 — Commit, push, raise the PR** | 🔴 **SKIPPED ENTIRELY.** No commit, no push, no PR, no labels. The generated `spec/test-plans/…` files are left in the working tree and ride the **caller's own commit**. |
+  | **Step 6 — Completion + checkpoint** | Present a short **announcement** of what was generated (no Approve/Request-Changes question), then hand control straight back to the caller. |
+  | **Step 7 — Audit log** | ▶ **RUNS**, with `**Approve / Request Changes checkpoint**: Approved (automatic — workflow mode, no ve review)` and an explicit `**Mode**: workflow (invoked by <workflow>) — no ve branch, no ve PR` line. |
+
+  🔴 **WORKFLOW MODE changes nothing about the CONTENT you generate** — same black-box derivation from
+  acceptance criteria, same mandatory `TC-[PLAN]-[nn]` format, same AC-coverage gate. It removes the
+  approvals and the git mechanics, never the rigour.
+
+  🔴 **WORKFLOW MODE is not ve's sign-off.** The caller uses this output purely as scope for automated
+  UI tests. ve's own `/ve-implement` (standalone) and `ve-list-work` remain the only sign-off path.
+
+---
+
 ## Prerequisites
 
 Only that the story exists — in the `## Story Tracker`, in `stories.md`, or as an issue in the configured tracker (JIRA/ADO/GITHUB).

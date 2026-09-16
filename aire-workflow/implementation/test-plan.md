@@ -132,6 +132,12 @@ Present the applicability decision to ve before writing files:
 
 Wait for ve's answer.
 
+🔴 **WORKFLOW MODE exception** (`ve-implement-agent.md` Mode Detection — invoked by `dev-implement` /
+`bug-fix-implement` / `enhancement-implement`): **do NOT wait.** Present the applicability table as an
+**announcement** and proceed straight to Step 4. The invoking workflow has no approval gates, and the
+applicability decision is derived from the story's own acceptance criteria — there is nothing here only
+a human could decide.
+
 ---
 
 ## Step 3: Manual Test Case Format (MANDATORY for every generated step)
@@ -288,6 +294,14 @@ present completion — add the missing cases first.
 ```
 
 **🔴 Confirm-first checkpoint — do not finish silently.** Immediately after the message above, ask:
+
+> 🔴 **WORKFLOW MODE exception** (`ve-implement-agent.md` Mode Detection): **SKIP this checkpoint
+> entirely.** The invoking implement workflow has no approval gates, and this content is being
+> generated as *scope for automated UI tests*, not as ve's reviewed test plan. Record
+> `**Approve / Request Changes checkpoint**: Approved (automatic — workflow mode, no ve review)` in
+> the Step 7 audit entry and hand control straight back to the caller. 🔴 Never present this
+> auto-approved content as ve-signed-off: ve's own standalone `/ve-implement` run and `ve-list-work`
+> remain the only sign-off path.
 
 ```markdown
  **Do you approve this test plan, or do you want to request changes?**

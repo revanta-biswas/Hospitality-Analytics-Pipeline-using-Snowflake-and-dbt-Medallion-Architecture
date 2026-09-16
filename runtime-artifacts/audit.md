@@ -752,3 +752,22 @@ until PR #11 is manually merged by the user, then ve signs it off via ve-list-wo
 **Context**: Story Selection + Doability Gate, dev-implement Step 2/3
 
 ---
+
+**Timestamp**: 2026-09-15T10:30:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.2 - Branch corrected, framework synced, baseline capture starting
+**TRACKER ITEM**: "[Story 1.2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Corrected an earlier mistake where story/1.2-... was accidentally cut from
+story/1.1-...'s HEAD instead of the epic branch (git checkout to the epic branch failed silently due
+to uncommitted changes, then the branch-creation command still ran against the wrong HEAD). Deleted
+and recut correctly from epic/harden-pipeline-security-and-data-quality (merge-base now matches
+exactly). Per user request, also synced this branch with the user's own AIRE framework file updates:
+merged main (containing the user's commit eda932d) into the epic branch (resolved 21 add/add conflicts
+by taking main's updated versions - the epic branch's original copies were superseded), pushed, then
+merged the updated epic branch into this story branch (clean, no conflicts). Proceeding to baseline
+capture and code generation for Story 1.2 (env_var() secrets in profiles.yml)."
+**Context**: dev-implement Step 1.5 (branch correction + sync)
+
+---

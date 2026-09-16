@@ -1,0 +1,55 @@
+{
+  "key": "story-1.1",
+  "rubricVersion": "1.0.0",
+  "judgeModel": "claude-sonnet-5",
+  "scoredAt": "2026-09-15T09:15:00Z",
+  "criteria": [
+    {
+      "id": "SEC-01",
+      "owasp": "A04:2025",
+      "metric": "Cryptographic Failures (credential/secret handling)",
+      "weight": 0.35,
+      "score": 1.0,
+      "citation": "src/snowflake/Copy_Into.sql (all three COPY INTO statements), src/snowflake/Stage.sql — no literal AWS/Snowflake credential; authentication routed through the s3_int STORAGE INTEGRATION object.",
+      "applicable": true
+    },
+    {
+      "id": "SEC-02",
+      "owasp": "A05:2025",
+      "metric": "Injection",
+      "weight": 0.20,
+      "score": null,
+      "applicable": false,
+      "reason": "No dbt Jinja-templated .sql model touched by this diff"
+    },
+    {
+      "id": "SEC-03",
+      "owasp": "A03:2025",
+      "metric": "Software Supply Chain Failures",
+      "weight": 0.20,
+      "score": null,
+      "applicable": false,
+      "reason": "No GitHub Actions workflow file touched by this diff"
+    },
+    {
+      "id": "SEC-04",
+      "owasp": "A02:2025",
+      "metric": "Security Misconfiguration",
+      "weight": 0.15,
+      "score": 1.0,
+      "citation": "src/snowflake/Stage.sql:11 — STORAGE_ALLOWED_LOCATIONS scoped to a specific bucket path ('s3://your_s3_bucket_path/'), not a wildcard. IAM role trust-policy step correctly documented as out-of-band, not left as an insecure default in this SQL.",
+      "applicable": true
+    },
+    {
+      "id": "SEC-05",
+      "owasp": "A08:2025",
+      "metric": "Software or Data Integrity Failures",
+      "weight": 0.10,
+      "score": null,
+      "applicable": false,
+      "reason": "No dbt schema test added by this story"
+    }
+  ],
+  "renormalizedWeightedScore": 1.0,
+  "note": "Applicable criteria SEC-01 (0.35) + SEC-04 (0.15) = 0.5 total weight, renormalized to 1.0; both scored 1.0, per eval-framework.md Section 4.1 rule 5."
+}

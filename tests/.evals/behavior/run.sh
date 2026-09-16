@@ -49,7 +49,7 @@ run_features() { # $@ = feature files
   local -a test_modules=()
   local feat key module
   for feat in "$@"; do
-    key="$(basename "$feat" .feature)"                  # story-1.2
+    key="$(basename "$feat" .feature)"                  # e.g. story-1.2
     module="tests/behavior/test_$(echo "$key" | tr '.-' '__').py"  # story-1.2 -> test_story_1_2.py
     if [ -f "$module" ]; then
       test_modules+=("$module")
@@ -118,7 +118,7 @@ case "$TIER" in
   b2)
     # 🔴 B2 is every OTHER feature file — it MUST exclude this unit's own (AIRE_STORY_KEY), or B2
     #    always includes B1's own scenarios (wrong: it would report N/A-worthy "no others" as a false
-    #    pass on the very first story, and double-count the current unit into B2 on every later one).
+    #    pass on the very first story, and double-count the current unit's file on every later one).
     mapfile -t all_features < <(ls -1 "${BEHAVIOR_DIR}"/*.feature 2>/dev/null || true)
     others=()
     for f in "${all_features[@]}"; do

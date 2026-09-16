@@ -4,9 +4,13 @@ FROM docker.io/library/python:3.12-slim
 
 WORKDIR /work
 
-# Stack's Gherkin runner install (Python -> pytest-bdd, per common/behavior-spec.md Section 4.1):
+# Stack's Gherkin runner install (Python -> pytest-bdd, per common/behavior-spec.md Section 4.1).
+# Installs the exact [dependency-groups.dev] set from this repo's pyproject.toml so the container
+# matches what a developer's local venv actually has - this is what makes the Podman gate mean
+# something (Section 5.2.1: "installs cleanly" is not proof it runs; catching a missing dep like
+# this IS the environment-parity check the sandbox exists for).
 # >>> STACK-RESOLVED BEHAVIOUR DEPS START <<<
-RUN pip install --no-cache-dir pytest-bdd
+RUN pip install --no-cache-dir "pytest>=8.0.0" "pytest-bdd>=8.0.0" "sqlparse>=0.5.0" "pyyaml>=6.0"
 # >>> STACK-RESOLVED BEHAVIOUR DEPS END <<<
 
 # run.sh is bind-mounted with the repo at runtime; nothing to COPY.

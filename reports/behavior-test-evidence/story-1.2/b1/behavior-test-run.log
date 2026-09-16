@@ -1,0 +1,46 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /work
+configfile: pyproject.toml
+plugins: bdd-8.1.0
+collecting ... collected 5 items
+
+tests/behavior/test_story_1_2.py::test_account_user_password_role_and_warehouse_are_env_var_references PASSED [ 20%]
+tests/behavior/test_story_1_2.py::test_schema_threads_and_type_remain_literal PASSED [ 40%]
+tests/behavior/test_story_1_2.py::test_required_environment_variable_names_are_documented PASSED [ 60%]
+tests/behavior/test_story_1_2.py::test_repowide_search_for_a_literal_secret_value_returns_zero_matches PASSED [ 80%]
+tests/behavior/test_story_1_2.py::test_profilesyml_remains_valid_yaml PASSED [100%]
+
+=============================== warnings summary ===============================
+../usr/local/lib/python3.12/site-packages/pytest_bdd/plugin.py:137
+  /usr/local/lib/python3.12/site-packages/pytest_bdd/plugin.py:137: PytestUnknownMarkWarning: Unknown pytest.mark.AC-1 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    mark = getattr(pytest.mark, tag)
+
+../usr/local/lib/python3.12/site-packages/pytest_bdd/plugin.py:137
+  /usr/local/lib/python3.12/site-packages/pytest_bdd/plugin.py:137: PytestUnknownMarkWarning: Unknown pytest.mark.AC-2 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    mark = getattr(pytest.mark, tag)
+
+../usr/local/lib/python3.12/site-packages/pytest_bdd/plugin.py:137
+  /usr/local/lib/python3.12/site-packages/pytest_bdd/plugin.py:137: PytestUnknownMarkWarning: Unknown pytest.mark.AC-3 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    mark = getattr(pytest.mark, tag)
+
+../usr/local/lib/python3.12/site-packages/pytest_bdd/plugin.py:137
+  /usr/local/lib/python3.12/site-packages/pytest_bdd/plugin.py:137: PytestUnknownMarkWarning: Unknown pytest.mark.AC-4 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    mark = getattr(pytest.mark, tag)
+
+../usr/local/lib/python3.12/site-packages/pytest_bdd/plugin.py:137
+  /usr/local/lib/python3.12/site-packages/pytest_bdd/plugin.py:137: PytestUnknownMarkWarning: Unknown pytest.mark.AC-5 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    mark = getattr(pytest.mark, tag)
+
+tests/behavior/test_story_1_2.py: 10 warnings
+  /usr/local/lib/python3.12/site-packages/pytest_bdd/compat.py:28: PytestRemovedIn10Warning: Passing nodeid to _register_fixture is deprecated. Pass node instead for fixture scoping.
+    request._fixturemanager._register_fixture(
+
+tests/behavior/test_story_1_2.py: 10 warnings
+  /usr/local/lib/python3.12/site-packages/_pytest/fixtures.py:1986: PytestRemovedIn10Warning: Passing baseid to FixtureDef is deprecated. Pass node instead for fixture scoping.
+    fixture_def = FixtureDef(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+----- generated xml file: /work/tests/.evals/_run/behavior-test-report.xml -----
+======================== 5 passed, 25 warnings in 0.04s ========================

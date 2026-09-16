@@ -1,0 +1,42 @@
+{
+  "key": "story-1.2",
+  "trackerId": "#2",
+  "evalFrameworkVersion": "1.0.0",
+  "scope": "changed-files",
+  "changedFiles": 6,
+  "changedFileList": [
+    "src/dbt_code/profiles.yml",
+    "src/dbt_code/README.md",
+    "spec/behavior/story-1.2.feature",
+    "tests/behavior/conftest.py",
+    "tests/behavior/test_story_1_2.py",
+    "tests/behavior/steps/profile_secrets_steps.py"
+  ],
+  "bootstrap": { "created": [], "reused": [] },
+  "gates": {
+    "D1_lint": { "status": "PASS", "findings": 0, "note": "0 .py files under sourcePaths (src/dbt_code, src/snowflake) at baseline and post-change." },
+    "D2_types": { "status": "PASS", "findings": 0, "note": "0 .py[i] files under sourcePaths." },
+    "D3_sast": { "status": "PASS", "findings": 0, "note": "semgrep --config auto, 0 findings baseline and post-change." },
+    "D4_deps": { "status": "PASS", "findings": 0, "note": "pip-audit: no known vulnerabilities (dependency graph unchanged)." },
+    "D5_licenses": { "status": "PASS", "findings": 0, "note": "pip-licenses: no disallowedLicenses match (unchanged)." },
+    "D6_complexity": { "status": "PASS", "findings": 0, "note": "0 .py files under sourcePaths." },
+    "D7_secrets": {
+      "status": "PASS",
+      "findings": 0,
+      "note": "4 pre-existing findings (curl-auth-user on ${SONAR_TOKEN} in CI template files) present at BOTH baseline and post-change with IDENTICAL fingerprints, outside src/dbt_code/. Independently verified zero leaks in src/dbt_code/ via `gitleaks detect --source src/dbt_code`. Zero NEW findings."
+    },
+    "unitCoverage": { "status": "N/A", "reason": "No .py application code changed by this story (pure YAML + markdown docs change)." },
+    "behaviorB1": { "status": "PASS", "containerised": true, "image": "localhost/aire-behavior:local", "imageId": "20c0a061be1dc9ca94297e57417158d8b00d94d067f52254e4907d85ac3b19cd", "note": "5/5 scenarios passed, one per @AC-n (AC-1..AC-5), run for real inside Podman per common/behavior-spec.md Section 5." },
+    "behaviorB2": { "status": "N/A", "reason": "No OTHER story feature file exists yet in spec/behavior/ besides this unit's own (verified: run.sh b2 exits 3 with that exact reason)." },
+    "behaviorB3": { "status": "N/A", "reason": "Not the last work unit of the cycle — stories 1.1, 1.3-1.8 have no merged PRs yet (common/behavior-spec.md Section 6.1)." },
+    "apiContract": { "status": "N/A", "reason": "Story's plan has no API Layer Generation step (pure YAML config, no service endpoint)." },
+    "testPlacement": { "status": "N/A", "reason": "check-test-placement.{sh,ps1} template does not exist yet in aire-workflow/templates/ci/ (framework-infrastructure gap, logged separately, not blocking — story adds only behavior-tier test files, which are correctly placed under tests/behavior/ per the existing convention)." },
+    "J1_architecture": { "status": "PASS", "score": 1.0, "rubricVersion": "1.0.0", "judgeModel": "claude-sonnet-5", "note": "Only ARCH-01 applicable (renormalized weight 1.0); see reports/eval-evidence/story-1.2/judge/architecture-score.json" },
+    "J2_security": { "status": "PASS", "score": 1.0, "rubricVersion": "1.0.0", "judgeModel": "claude-sonnet-5", "note": "SEC-01 + SEC-04 applicable (renormalized); see reports/eval-evidence/story-1.2/judge/security-score.json" }
+  },
+  "overall": "PASS",
+  "checksRun": 10,
+  "checksTotal": 15,
+  "checksNA": ["unitCoverage", "apiContract", "behaviorB2", "behaviorB3", "testPlacement"],
+  "verdictNote": "10 of 15 declared checks ran with a real result (D1-D7 + behaviorB1 + J1 + J2). 5 legitimately N/A per the closed list in eval-framework.md Section 2.5.1 reasons. Code Review verdict: APPROVED, zero findings — see reports/reviews/story-1.2-code-review-v1.md."
+}

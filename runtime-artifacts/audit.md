@@ -771,3 +771,72 @@ capture and code generation for Story 1.2 (env_var() secrets in profiles.yml)."
 **Context**: dev-implement Step 1.5 (branch correction + sync)
 
 ---
+
+**Timestamp**: 2026-09-15T10:35:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.2 - Framework update review; noted infrastructure gap (non-blocking)
+**TRACKER ITEM**: "[Story 1.2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Reviewed the diff the framework update introduced to dev-implement.md/directory-structure.md/
+ci-pipeline-generation.md before continuing Story 1.2. New gates: SH-LOOP-12 Test Placement
+Verification (Step 6.3), SH-LOOP-11 Playwright UI Automation (Step 6.7 part 2, UI stories only),
+mandatory ve-implement invocation every story (Step 6.7 part 1), SH-LOOP-10 CI Attestation (Section D
+Step 8). Checked aire-workflow/templates/ci/ for the check-test-placement.{sh,ps1} template the new
+Section 4.0.7 rule references - it does not exist yet (documentation-only sync; the canonical script
+template itself wasn't included). NOTED, not blocking: Story 1.2 has zero test files (pure YAML +
+markdown docs change), so the Test Placement Verification Gate is legitimately N/A per its own rule
+('N/A only when this story changed no test files at all') regardless of the missing script. Proceeding
+with Story 1.2; will invoke ve-implement per the new mandatory Step 6.7 part 1. Playwright (Step 6.7
+part 2) is N/A - no Frontend Components Generation step in this story's plan."
+**Context**: dev-implement Code Generation, framework-update reconciliation
+
+---
+
+## Test Plan (ve-implement skill)
+**Timestamp**: 2026-09-16T10:04:43Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "Story 1.2 (mode: workflow - invoked automatically from dev-implement per the mandatory Step 6.7 part 1)"
+**Story**: "1.2 - Externalize dbt connection secrets via environment variables - [#2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Output folder**: `spec/test-plans/2-externalize-dbt-secrets-env-vars/`
+**ve branch / PR**: "N/A - workflow mode skips the ve/... branch and PR entirely (Step 3, Step 5 both skipped per Mode Detection); artifacts ride this story's own commit on story/1.2-externalize-dbt-secrets-env-vars"
+**Test plans generated**: "Security (5 cases: TC-SEC-01..05) - N/A plans: Integration (no service boundary), E2E (no user-visible workflow), API (no endpoint), Contract (no consumer/provider schema), Performance (no latency/throughput target), Accessibility (no UI)"
+**Coverage**: "5/5 acceptance criteria covered"
+**Approve / Request Changes checkpoint**: "Approved (automatic - workflow mode, no ve review)"
+**AI Response**: "Generated black-box security test plan for Story 1.2, derived solely from stories.md ACs and requirements.md REQ-F-02/REQ-NF-01/REQ-NF-02 text - no application source code was read. 5 test cases covering literal-secret absence, non-secret fields staying literal, README documentation, a negative case (missing env var fails safely), and YAML validity. All 5 ACs traced to >=1 test case."
+**Context**: `/ve-implement` skill - Test Plan (`test-plan.md`), invoked in WORKFLOW MODE by dev-implement Step 6.7 part 1
+
+---
+
+**Timestamp**: 2026-09-16T10:20:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.2 - Automated Code Review complete
+**TRACKER ITEM**: "[Story 1.2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Ran Code Review (INITIAL_REVIEW) scoped to Story 1.2. Phase 2: all 5 ACs Met with
+file:line evidence, independently re-verified. Phase 2.5 Security Baseline (diff-scoped): 1/16 rules
+applicable (SECURITY-12 no-hardcoded-credentials - compliant) - report at
+reports/code-security-reviews/security-review-2026-09-16.md, verdict PASS, 0 findings. Phase 3.5
+Judge Gates: J1=1.0 (only ARCH-01 applicable), J2=1.0 (SEC-01+SEC-04 applicable) - both above 0.85
+threshold. Report at reports/reviews/story-1.2-code-review-v1.md. Verdict APPROVED, 0 findings -
+routing straight to commit/push/PR (Section D), no Remediate loop needed."
+**Context**: dev-implement Section A/B (Auto Code Review + Verdict Routing)
+
+---
+
+**Timestamp**: 2026-09-16T10:25:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.2 - Housekeeping: found and fixed another .gitignore evidence-dropping gap
+**TRACKER ITEM**: "[Story 1.2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Before committing, git status showed several mandatory evidence .log files
+(behavior-test-run.log, baseline-regression.log, full-regression.log) as untracked/absent from the
+staged diff despite being written to disk. Found the same class of defect as the earlier *.json gap:
+the blanket `*.log` rule in .gitignore was silently dropping all evidence logs required by
+eval-framework.md Section 6 / behavior-spec.md Section 6.2. Fixed by adding `!reports/**/*.log`,
+matching the existing `!reports/**/*.json` pattern. Re-staged - all 3 log files now tracked."
+**Context**: Housekeeping, dev-implement Section D (commit preparation)
+
+---

@@ -14,6 +14,46 @@ tooling. Backend/API manual cases are never in scope here — they stay manual-o
 
 ---
 
+## Mode Detection (do this FIRST — decides which steps run)
+
+This agent runs in one of **two modes**. Resolve the mode before anything else — it changes which
+steps execute, and getting it wrong is destructive (checking out the integration branch mid-run of
+`dev-implement` would abandon the work unit's uncommitted code).
+
+- **STANDALONE MODE** — the default. The user typed `/playwright-implement …` themselves, **after**
+  both merges have landed. Run **every** step below exactly as written, including Step 2a's
+  both-merges gate, Step 3's integration-branch checkout, Step 7's Approval Gate, and Step 12's Push
+  Gate + direct push. (🔴 `--headed` execution is NOT mode-specific — it applies in **both** modes.)
+
+- **WORKFLOW MODE** — invoked as a step by `dev-implement` / `bug-fix-implement` /
+  `enhancement-implement` (their Playwright UI Automation Gate — `implementation/code-generation.md`
+  Step 11d), with the story/ticket **passed in** and `mode: workflow`. The caller is mid-run on the
+  work unit's own branch, **pre-PR and pre-merge by design**, and has no approval gates, so:
+
+  | Step | WORKFLOW MODE behaviour |
+  |---|---|
+  | **Step 2 — Resolve the target story** | 🔴 **SKIPPED.** The story is passed in. Never present the picker. If `tests/e2e/<story-slug>/` already exists, refresh it — do NOT ask refresh-or-stop. |
+  | **Step 2a — Verify BOTH merges** | 🔴 **SKIPPED — N/A by design.** Nothing has merged yet: that gate exists because the standalone path runs post-merge and needs the code + docs already on the integration branch. In WORKFLOW MODE the code under test is in **this very working tree**, which is strictly better evidence than a merge check. Record `Step 2a: N/A — workflow mode (pre-merge, code present in the working tree)`. |
+  | **Step 3 — Resolve integration branch + checkout** | 🔴 **SKIPPED ENTIRELY.** Stay on the branch you were invoked on. **Never `git checkout`, never `git pull`, never switch branches** — the caller's uncommitted work is in this tree. |
+  | **Step 4 — Playwright project root** | ▶ RUNS as written (`<playwright-root>` = the true workspace root). |
+  | **Step 5 — Prerequisite Gate + Seed Test Gate** | ▶ **RUNS IN FULL — it is still a blocking gate.** 🔴 **Every "confirm-first" install in Step 0a resolves to INSTALL, announced, never to skip**: missing `@playwright/test`, missing `.claude/agents/playwright-test-*`, or a missing `.mcp.json` entry means **run `npm i -D @playwright/test && npx playwright install` and/or `npx playwright init-agents --loop=claude` right now**. "The agents aren't installed" is an **ERROR to fix**, never a gap to disclose and never a reason to hand-author specs. 🔴 **If `init-agents` had to run, HALT right there and ask for a session restart** (Step 0a's verbatim block) — the `playwright-test` MCP server is not connected in this session, so the subagents cannot run. That halt is a **sanctioned hard stop, not an approval prompt**; the caller resumes at its Playwright gate afterwards, skipping everything already logged as passed. If everything was already installed, carry on without pausing. The fixture-data checklist auto-applies any confidently-derivable answer, and the **Seed Test Gate auto-derives and applies** its addition (announced, never asked). 🔴 If the seed genuinely cannot be derived, **HALT** with a short report naming exactly what `tests/e2e/seed.spec.ts` needs — a one-time input gap, not a retry-loop failure. |
+  | **Step 5b — Start the app locally** | 🔴 **ADDITIONAL, WORKFLOW MODE ONLY.** Nobody is at a terminal to have started the app, so start it yourself: resolve the project's own start command (repo script → direct invocation, **never invented**), run it backgrounded via Bash, poll the readiness URL/port until it answers, and **tear it down on every exit path**. Report the resolved `startCommand` + `readinessUrl` back to the caller for its `ci.playwright` manifest fragment. |
+  | **Step 6 — PLANNER** | ▶ RUNS as written (real `playwright-test-planner` subagent). |
+  | **Step 7 — Approval Gate** | 🔴 **SKIPPED.** The plan is auto-approved. Log `Playwright plan auto-approved (workflow mode, no gate) — tests/playwright-specs/<story-slug>.md`. |
+  | **Steps 8–9 — GENERATOR + Consistency Pass** | ▶ RUN as written — still strictly sequential, never parallel. |
+  | **Step 10 — Local execution** | ▶ **RUNS EXACTLY AS STANDALONE — `--headed`.** 🔴 This is local execution on the developer's own machine; watching the browser drive the story they just built is the point, and nothing about running inside a workflow changes that. **Headless belongs to CI alone**, because a runner has no display. The only local fallback is a machine with genuinely no display (proven by the failure, not assumed) — then record `"headed": false` with the real reason in the evidence manifest and say so. |
+  | **Step 11 — HEALER** | ▶ RUNS as written, its own loop never shortcut. 🔴 **But a `test.fixme()` outcome does NOT pass the caller's gate** — in workflow mode it means a real app defect the caller must fix in the same run (its SH-LOOP-11), not a flag to triage later. Report every `test.fixme()` back explicitly. |
+  | **Step 12 — Push Gate + push** | 🔴 **SKIPPED ENTIRELY.** No push gate, no commit, no push. The generated artifacts are left in the working tree and ride the **caller's own commit**. |
+  | **Step 13 — Completion** | Present a short **announcement** (what was generated, pass/fail before and after healing, any `test.fixme()`), then hand control straight back to the caller. Omit the standalone NEXT-ACTIONS block. |
+
+  🔴 **WORKFLOW MODE removes approvals and git mechanics — never verification, and never the browser.**
+  The Planner, Generator and Healer are still the real installed Playwright subagents, the tests are
+  still really executed `--headed` against a really running app, and a failing spec still fails the
+  caller's gate. **Headless is CI's business alone** (no display on a runner) — it is never a local
+  default in either mode.
+
+---
+
 ## Prerequisites
 
 - **Playwright Test Automation is always mandatory** (per CLAUDE.md, same as Security Baseline) — no
@@ -28,14 +68,18 @@ tooling. Backend/API manual cases are never in scope here — they stay manual-o
   `runtime-artifacts/audit.md` for that story's `/ve-implement` run entry with
   `**Approve / Request Changes checkpoint**: Approved`. See `playwright-automation.md`'s
   Prerequisites for the full check.
-- **Both merges already happened**: the dev's story PR merged into the integration branch, AND
-  `/ve-implement`'s own `ve/<TICKET-ID>-<title-kebab>` PR (the manual docs) merged too — this is
-  what makes the integration branch (Step 3) the right place to work directly. If either hasn't
-  merged yet, stop and say which one is still pending rather than proceeding on a branch that doesn't
-  yet have what it needs.
-- **Run this in its own terminal/session, on the same integration branch.** It is a longer, sequential
-  flow (Planner → approval → Generator → execution → Healer → push gate) meant to run alongside
-  `ve-list-work` working its Approve/Reject queue in a separate terminal — not inside it.
+- **Both merges already happened** — 🔴 **STANDALONE MODE ONLY**: the dev's story PR merged into the
+  integration branch, AND `/ve-implement`'s own `ve/<TICKET-ID>-<title-kebab>` PR (the manual docs)
+  merged too — this is what makes the integration branch (Step 3) the right place to work directly. If
+  either hasn't merged yet, stop and say which one is still pending rather than proceeding on a branch
+  that doesn't yet have what it needs. **In WORKFLOW MODE this prerequisite does not apply at all** —
+  the caller is deliberately pre-merge and the code under test is in the working tree (see Mode
+  Detection, Step 2a).
+- **Run this in its own terminal/session, on the same integration branch** — 🔴 **STANDALONE MODE
+  ONLY**. It is a longer, sequential flow (Planner → approval → Generator → execution → Healer → push
+  gate) meant to run alongside `ve-list-work` working its Approve/Reject queue in a separate terminal
+  — not inside it. **In WORKFLOW MODE it runs inline inside the invoking implement workflow's own
+  session and branch**, and its approval/push steps are skipped.
 
 ---
 
@@ -149,6 +193,12 @@ Execute `playwright-automation.md` Step 1: filter the story's manual test files 
 only, then invoke the Agent tool with `subagent_type: "playwright-test-planner"` using the prompt
 template there. Wait for it to complete and confirm `tests/playwright-specs/<story-slug>.md` was
 written (via its own `planner_save_plan` call).
+
+🔴 **The confirmation has a remedy, not just a verdict.** If the file is absent: check Playwright's own
+default bare `specs/` (where the plan lands if the target directory did not exist), move it into
+`tests/playwright-specs/`, and re-verify. If no plan file exists anywhere, the Planner genuinely failed
+— report it as an **ERROR and stop**. 🔴 Never proceed to the Generator without a real Planner plan, and
+never write the plan or the specs yourself as a substitute (Rule 1b).
 
 ### Step 7:  Present the Approval Gate
 
@@ -270,18 +320,28 @@ Present `playwright-automation.md` Step 6's completion message and checkpoint, t
     always.** Confirmed failure mode: parallel Generator calls race to bootstrap
     `playwright.config.ts` and leave zombie `run-test-mcp-server` processes that block subsequent
     calls until manually killed.
-14. **No branch of any kind, and no PR.** This skill runs directly on `<integration-branch>` — after
-    both the dev's story PR and `/ve-implement`'s own `ve/<TICKET-ID>-<title-kebab>` PR have
-    already merged into it. It never cuts, resumes, or recreates a branch; it commits and pushes
-    straight to `<integration-branch>` after the Step 12 push gate.
-15. **Both merges are an executable gate (Step 2a), never an assumption.** Verify via `gh pr view`/
-    `gh pr list`, the same mechanics `ve-list-work` already uses — never proceed on Prerequisites'
-    narrative description alone, and never list a story as available (Step 2, no-identifier case)
-    without this check passing.
-16. **Two mandatory human gates before ANY code lands**, plus a third before the push: the Seed Test
-    Gate (Step 5), the Approval Gate on the Planner's plan (Step 7), and the Push Gate (Step 12) —
-    since there is no PR here, the Push Gate is this skill's only review checkpoint before
-    `<integration-branch>` changes. None are skippable.
+14. **No branch of any kind, and no PR.** In **STANDALONE MODE** this skill runs directly on
+    `<integration-branch>` — after both the dev's story PR and `/ve-implement`'s own
+    `ve/<TICKET-ID>-<title-kebab>` PR have already merged into it — and commits + pushes straight to
+    that branch after the Step 12 push gate. In **WORKFLOW MODE** it touches git **not at all**: no
+    checkout, no commit, no push; its output rides the caller's commit. Either way it never cuts,
+    resumes, or recreates a branch.
+15. **Both merges are an executable gate (Step 2a), never an assumption — in STANDALONE MODE.** Verify
+    via `gh pr view`/`gh pr list`, the same mechanics `ve-list-work` already uses — never proceed on
+    Prerequisites' narrative description alone, and never list a story as available (Step 2,
+    no-identifier case) without this check passing. 🔴 **In WORKFLOW MODE the gate is N/A by design**
+    (pre-merge, code in the working tree) — recorded as such, never silently dropped.
+16. **Gates by mode.** **STANDALONE**: three mandatory human gates — the Seed Test Gate (Step 5), the
+    Approval Gate on the Planner's plan (Step 7), and the Push Gate (Step 12), which is the only
+    review checkpoint before `<integration-branch>` changes. None are skippable. **WORKFLOW**: all
+    three are skipped by the caller's own authorization (the Seed Test Gate auto-derives, the
+    Approval Gate is auto-approved, and there is no push at all) — 🔴 but **every verification step
+    still runs**, and a failing spec still fails the caller's gate.
 17. **Re-pull `--ff-only` immediately before the Step 12 commit** and fail loudly on divergence —
     never auto-merge or rebase a shared branch. The same discipline applies to the push itself: a
     rejected non-fast-forward push means someone else moved the branch first — stop, don't force.
+    (STANDALONE MODE only — WORKFLOW MODE never commits or pushes.)
+18. **WORKFLOW MODE is invoked, never inlined.** `dev-implement` / `bug-fix-implement` /
+    `enhancement-implement` reach this agent by invoking the **`playwright-implement` skill** with
+    `mode: workflow` — they never re-implement these steps themselves. If you are reading this file
+    because a workflow copied its steps inline instead, that is the defect: invoke the skill.

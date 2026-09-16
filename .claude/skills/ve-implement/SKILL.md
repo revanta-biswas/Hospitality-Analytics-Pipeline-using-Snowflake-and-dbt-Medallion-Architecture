@@ -15,6 +15,13 @@ description: >
   that branch, labeled `ai-generated` + `aire-v<version>` (the framework version read live from
   CLAUDE.md, same convention as pr-generator). No test automation, no test execution, no application code
   changes — and never changes story or tracker status (that remains `ve-list-work`'s job).
+  TWO MODES: STANDALONE (ve types /ve-implement — everything above applies as written, including the
+  story-picker, the ve/... branch, the Approve/Request-Changes checkpoint and the PR), and WORKFLOW
+  (invoked as a step by dev-implement / bug-fix-implement / enhancement-implement with mode: workflow
+  and the story passed in, purely to derive the UI test scope for their Playwright gate — the
+  story-picker, the ve/... branch, the approval checkpoint and the push/PR are all SKIPPED; the
+  generated spec/test-plans/ files stay in the working tree and ride the caller's own commit). Content
+  and rigour are identical in both modes; WORKFLOW MODE output is NOT ve sign-off.
 when_to_use: >
   Trigger when the user says: "/ve-implement 1.2", "/ve-implement PROJ-123", "/ve-implement",
   "Test Plan for story 1.2", "generate test steps for story 1.2",
@@ -32,4 +39,9 @@ aire-workflow/agents/ve-implement-agent.md
 ```
 
 Read that file completely and follow every step defined in it.
+
+🔴 **FIRST resolve the mode** (`ve-implement-agent.md` → **Mode Detection**): **STANDALONE** (ve typed
+the trigger) runs every step as written; **WORKFLOW** (`mode: workflow`, invoked by `dev-implement` /
+`bug-fix-implement` / `enhancement-implement` with the story passed in) skips the story-picker, the
+`ve/…` branch, the Approve/Request-Changes checkpoint and the push/PR — and touches git not at all.
 

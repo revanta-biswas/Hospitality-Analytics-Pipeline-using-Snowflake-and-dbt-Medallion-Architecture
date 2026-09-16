@@ -78,34 +78,44 @@ Add this section early in the workflow (at the resume check / ticket capture sta
 
 ### When CI Setup EXISTS (established AIRE project)
 
-**In `bug-fix.md` Step 8.5:**
-- ✅ Skip the complete CI setup + smoke test PR stage
+**In `bug-fix.md` Step 8.5 (Section 5 — CI Pipeline Setup):**
+- ✅ Skip generating `.github/workflows/agentic-eval-pipeline.yml`, `sonar-project.properties`, and the `tests/.evals/scripts/*` set — reuse whatever already exists AS-IS
 - ✅ Announce: "CI infrastructure already exists — skipping full setup"
-- ✅ Proceed directly to design artifacts (architecture.md, rubrics)
-- ✅ Scripts that are affected by bug changes are evaluated as normal (via dev-implement's own preflight)
+- ✅ Proceed directly to design artifacts (architecture.md, rubrics) — these are ALWAYS created/reused regardless of CI Setup Status; skipping CI setup never skips architecture.md or behavior.feature
+
+**In `bug-fix.md` Step 9, Item 2 (the `smoke-test-epic.{sh,ps1}` scratch-PR run — a DIFFERENT step from Step 8.5's CI pipeline generation, and the one actually observed to misfire):**
+- ✅ **Skip it entirely — do not run it, do not present its "Run smoke test? (yes/no)" prompt.** The environment was already validated by a prior cycle's smoke test when the CI infrastructure was first bootstrapped; re-running it on every ticket is redundant.
+- ✅ Announce: "CI infrastructure already exists — skipping the pre-handoff smoke test."
+- ✅ Item 1 (commit + push the analysis/design artifacts) and Item 3 (the ve break message) still run exactly as written — only the smoke test itself is skipped.
 
 **In `bug-fix-implement.md` Step 9.1.5 (CI Preflight):**
-- ✅ Run normally (preflight validates manifest + script executability)
+- ✅ Run normally (preflight validates manifest + script executability) — this is a per-fix declaration check, unrelated to the one-time environment smoke test, and is NEVER skipped by CI Setup Status
 - ✅ No separate smoke test
 - ✅ No duplicate CI artifact generation
 
-**In `enhancement-implement.md` Step 8.5:**
-- ✅ Skip the complete CI setup + smoke test PR stage
-- ✅ Proceed to design artifacts
-- ✅ Same flow as bug-fix
+**In `enhancement-implement.md` Step 8.5 (Section 5 — CI Pipeline Setup):**
+- ✅ Same as `bug-fix.md` Step 8.5 above — skip CI pipeline generation, proceed to design artifacts
+
+**In `enhancement-implement.md`'s ve Handoff Break, Item 2 (the `smoke-test-epic.{sh,ps1}` scratch-PR run):**
+- ✅ Same as `bug-fix.md` Step 9 Item 2 above — skip it entirely, announced; Items 1 and 3 still run.
 
 ### When CI Setup MISSING (new repo, first AIRE cycle)
 
 **In `bug-fix.md` Step 8.5:**
-- ✅ Run full CI setup with smoke test PR (current behavior)
+- ✅ Run full CI setup (pipeline, SonarQube setup gate, scripts) — current behavior
 - ✅ Generate all required artifacts
-- ✅ Run pre-handoff smoke test before Development Handoff
+
+**In `bug-fix.md` Step 9, Item 2:**
+- ✅ Run the pre-handoff smoke test before the ve break message — current behavior
 
 **In `bug-fix-implement.md` Step 9.1.5:**
 - ✅ Run preflight normally
 
 **In `enhancement-implement.md` Step 8.5:**
-- ✅ Run full CI setup with smoke test PR (current behavior)
+- ✅ Run full CI setup — current behavior
+
+**In `enhancement-implement.md`'s ve Handoff Break, Item 2:**
+- ✅ Run the pre-handoff smoke test — current behavior
 
 ---
 
@@ -131,3 +141,5 @@ Every detection must be logged to `runtime-artifacts/audit.md` with:
 🔴 **Established projects stay unchanged** — reuse existing CI artifacts AS-IS. Never regenerate or update them unless thresholds changed (that happens at a later stage, outside this detection).
 
 🔴 **Artifact Ownership still applies** — if CI artifacts exist on the base branch, inherited cycles use them AS-IS; create-if-missing only applies to artifacts that are genuinely missing.
+
+🔴 **This detection ONLY gates CI pipeline bootstrap (the `.github/workflows/agentic-eval-pipeline.yml` generation stage) and the one-time `smoke-test-epic.{sh,ps1}` scratch-PR run.** It NEVER gates `spec/plans/architecture.md`, `spec/behavior.feature`, the rubrics, or any other STOP CHECKPOINT artifact — those are always created (if genuinely absent) or reused AS-IS, on every ticket, regardless of `## CI Setup Status`. "CI already exists" means "the pipeline and its one-time environment check don't need to run again" — it does not mean "skip the design/behavior/rubric artifacts for this ticket."

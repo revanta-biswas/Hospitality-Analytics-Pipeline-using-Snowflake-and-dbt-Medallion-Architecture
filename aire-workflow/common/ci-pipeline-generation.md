@@ -7,9 +7,9 @@
 🔴 **The pipeline is not written by the model.** `templates/ci/` (this same `aire-workflow/`
 directory) holds the canonical, versioned source: `agentic-eval-pipeline.yml.template`, the
 `lib-manifest`/`read-manifest`/`ci-manifest-runner`/`run-static-evals`/`run-evals`/`auto-fix-agent`/
-`validate-pipeline`/`smoke-test-epic` scripts (`.sh` + `.ps1` — the first three are #7a's run-time
-manifest readers, Section 4.0d.1/4.0f), the `behavior/` Containerfile and entry point, and
-`sonar-project.properties.tmpl`. Generation means:
+`validate-pipeline`/`smoke-test-epic`/`check-test-placement` scripts (`.sh` + `.ps1` — the first three
+are #7a's run-time manifest readers, Section 4.0d.1/4.0f; `check-test-placement` is Section 4.0.7), the
+`behavior/` Containerfile and entry point, and `sonar-project.properties.tmpl`. Generation means:
 detect the stack, fill the `ci` manifest block in `tests/.evals/config.json` (Section 3 below defines what
 goes in it), **copy** these files into the target repo, and substitute the fixed `${SLOT}` markers.
 Read `templates/ci/TEMPLATE-MANIFEST.md` for the copy table and the complete slot list before generating anything.
@@ -17,6 +17,23 @@ Read `templates/ci/TEMPLATE-MANIFEST.md` for the copy table and the complete slo
 🔴 **Note:** CI pipeline generation invocation never ask the user to characterize
 implementation scope as "partial" or "full". Scope is always derived mechanically — from stack
 detection (Section 3) and, for stage execution, from the PR's own diff (Section 4.0d) — never asked.
+
+🔴 **THE SIZE OF THE JOB IS NEVER A REASON TO GATE IT.** Observed in a real run: the workflow reached
+this section, saw what full generation actually involves (~20 canonical scripts copied, the 700+ line
+YAML template, the V1–V34 validation sweep, the clean-room dry-run, the Section 4.1.2 SonarQube setup
+gate) and, before doing any of it, stopped and presented a fabricated multiple-choice menu —
+"Minimal CI bootstrap (Recommended) / Full CI generation per spec / Defer CI entirely, focus on the
+fix" — asking the user to pick a scope. **None of those three options exist anywhere in this file.**
+That is a fabricated gate, not a documented one, and picking "Minimal" would have silently skipped
+SonarQube setup, the clean-room dry-run and most of V1–V34 — producing a non-compliant pipeline the
+user never actually asked for. The correct behavior at this point is to generate the full pipeline as
+specified, unconditionally, with **zero** prompts of any kind — the job being large, multi-file, or
+time-consuming is not itself a trigger to pause and confirm; the only sanctioned halt in this entire
+procedure is the Section 4.1.2 SonarQube setup gate, presented verbatim, never summarized, never
+offered alongside other "options." If a request for confirmation of ANY kind (a scope choice, a
+"proceed? y/n", a menu, a plan-approval prompt) is about to be shown for CI pipeline generation and it
+is not the literal Section 4.1.2 block, that is a defect — do not show it, generate the pipeline
+instead.
 
 This deletes the failure mode a hand-authored pipeline invites: a model re-writing a constant,
 drifting between the verify and self-repair jobs, or quietly breaking the parser. A pasted pipeline
@@ -224,7 +241,7 @@ tool invocation → a stack that genuinely has no compile step resolves to an **
 | Secrets (D7) | `gitleaks detect` — **prefer the binary/container over `gitleaks/gitleaks-action`** (Section 4.0.3) | — | — | — | — |
 | Unit + coverage (and the `coverageFormat` it emits) | `jest --coverage` / `vitest run --coverage` -> **lcov** | `pytest --cov` -> **cobertura** | `mvn test jacoco:report` -> **jacoco** (🔴 NOT cobertura — a different XML schema) | `go test -coverprofile` -> **gocover** | `dotnet test --collect:"XPlat Code Coverage"` -> **cobertura** |
 | **Behavioural (Gherkin)** — always invoked via `tests/.evals/behavior/run.sh <tier>` inside Podman | `cucumber-js` | `pytest-bdd` | `mvn verify -Dcucumber` | `godog run` | `reqnroll` |
-| E2E | `playwright test` (only when the extension is enabled) | | | | |
+| **Playwright E2E (headless, CI trust gate)** — see Section 3.0g | `npx playwright test tests/e2e/` (only when `ci.playwright.enabled`) | | | | |
 
 🔴 A stage with no resolvable command is emitted as an explicit **skipped step with a `# reason:`
 comment**, never silently dropped and never faked with `echo ok`.
@@ -334,6 +351,42 @@ findings versus baseline". D5 therefore failed on any newly-introduced licence r
 `$AIRE_MAX_CYCLOMATIC_COMPLEXITY`). Never copy the literal number into the command — `eval-framework.md`
 Section 1 is explicit that `thresholds` is the only place a number lives, and a copied value drifts the
 moment one of them changes.
+
+### 3.0f 🔴 Playwright E2E — resolving the start command + readiness URL, and CI's trust-gate role
+
+🔴 **CI never originates Playwright coverage — it only re-executes what the local Playwright UI
+Automation Gate (`implementation/code-generation.md` Step 11d) already generated and ran.** This
+subsection resolves the two facts CI needs to reproduce that run headless, and defines what "trust
+gate" means operationally.
+
+**Resolution — the first work unit that runs the Playwright gate for real writes `ci.playwright` into
+`tests/.evals/config.json`** (`common/eval-framework.md` Section 1), exactly like a manifest fragment
+resolves a new tool: never guessed, always read from something the repo demonstrably has.
+
+| Field | Resolved from |
+|---|---|
+| `enabled` | `true` the first time a work unit's plan includes a Frontend Components Generation step and the Playwright gate actually ran (not merely planned) |
+| `startCommand` | The project's OWN start script (`package.json` `"dev"`/`"start"`, a documented `Makefile` target, or the direct framework invocation) — resolved the same way as every other command in this framework: repo script → direct invocation → never invented |
+| `readinessUrl` | The URL/port the story's System Under Test block already names (or the app's documented default) — the same value the local gate polled before running tests |
+| `testCommand` | Defaults to `npx playwright test tests/e2e/`; a project with a non-default `testDir` or reporter convention overrides it here, once |
+
+🔴 **CREATE IF MISSING, NEVER REGENERATE** (`common/directory-structure.md` Artifact Ownership) — once
+`ci.playwright` is resolved by a work unit, every later work unit and CI both read it as-is; a project
+with no UI at all simply never sets `enabled: true`, and the CI step below then reports `N/A` — never a
+guessed command.
+
+**What "trust gate" means in the generated pipeline**: the CI step (Section 4) installs Playwright +
+browsers, starts the app in the background using the SAME `startCommand`, waits on the SAME
+`readinessUrl`, runs the SAME `testCommand`, and tears the server down — the same specs and the same
+assertions that already ran and passed locally. 🔴 **The one and only difference is the display mode**:
+the local gate runs `--headed` (it is the developer's own machine, and watching the browser is the
+point), while CI runs headless **because a GitHub runner has no display** — a property of the
+environment, never a policy this framework applies locally. 🔴 **CI is NEVER where a Playwright scenario is written, planned,
+or healed** — Planner/Generator/Healer only ever run inside the local gate (Step 11d). A CI failure on
+a scenario that passed locally is therefore always a **provisioning/manifest defect** (a stale
+`startCommand`, a wrong `readinessUrl`, browsers not installed) — triaged and repaired exactly like any
+other CI Preflight/Attestation mismatch (`common/ci-pipeline-generation.md` Section 6.6), never a
+reason to re-run the Planner or to treat the local pass as unproven.
 
 ### 3.0 🔴 THE TEST COMMAND MUST BE NO-TESTS-SAFE — resolve it, and record the runner's zero-tests code
 
@@ -546,7 +599,10 @@ job: verify-and-evaluate
   │                                🔴 DELTA-SCOPED vs the base ref — never a whole-tree verdict
   ├── Stage 2  Behavioural         unit tests + coverage ≥ unitTestCoverageMin, then Gherkin
   │                                in Podman — B1 (this unit) · B2 (every other feature file)
-  │                                · B3 (whole epic) only on a PR into the base branch
+  │                                · B3 (whole epic) only on a PR into the base branch, then
+  │                                Playwright E2E headless — TRUST GATE, re-executes the local
+  │                                Step 11d run, never originates it — N/A when ci.playwright.enabled
+  │                                is not true (Section 3.0f)
   ├── Stage 3  Semantic            J1 architecture · J2 security (OWASP) vs tests/.evals/rubrics/*
   │                                BLOCKING at the config minimums
   ├── SonarQube               LAST gate step · if: always() · continue-on-error
@@ -606,6 +662,7 @@ enforce silently does not run, and the PR looks merely "red" rather than "unveri
 | V32 | **The Manifest triage class is WIRED, not just documented** | `auto-fix-agent.*` reads `tests/.evals/_run/manifest-defects.txt` and exits non-zero without repairing when it is non-empty, and it does so **before** the retry counter is written. 🔴 Section 6.4 described this class for a release while three scripts emitted `MANIFEST DEFECT` and **nothing consumed it** — a documented triage class with no consumer is the same defect as a documented gate with no step |
 | V33 | **Self-repair's scope is ENFORCED, not merely instructed** | `auto-fix-agent.*` compares every path it touched (committed **and** working-tree) against its scope and aborts **before the push** on a violation: on a `ci/epic-smoke-*` head branch `src/**` and `tests/**` (outside `tests/.evals/**`) are forbidden; on a work-unit PR `.github/workflows/**`, `tests/.evals/config.json`, `tests/.evals/rubrics/**`, `tests/.evals/ci-manifest.d/**` and `spec/**` are forbidden. A prompt is guidance; this check is what makes the scope binding |
 | V34 | **Every test command is no-tests-safe** | For each `ci.roots[]` entry with a `coverageCommand`, either the command carries the runner's own no-tests flag (`--passWithNoTests`) or the root declares `noTestsExitCode` (Section 3.0). A root with neither turns *"this repo has no suite yet"* into a hard gate failure — the exact condition that once produced 45 minutes of self-repair authoring dummy tests |
+| V35 | **`check-test-placement.*` exists, is wired into Stage 1, and can actually fail** | `tests/.evals/scripts/check-test-placement.{sh,ps1}` (Section 4.0.7) exists, appears as its own step in the generated YAML, and — same discipline as V9 — is proven to FAIL against a deliberately misplaced fixture (a `.test.`/`.spec.` file dropped under `src/`, or under a stray `tests/<name>/` outside `tests/unit/`/`tests/api/`) before being trusted on real diffs. Also grep it for a hardcoded `"verdict": "PASS"` literal not derived from the actual scan |
 
 🔴 **V25 and V26 were implemented in `validate-pipeline.sh`/`.ps1` before this table was kept current with
 them — they exist and run today even though they were missing from this list until V27 was added
@@ -847,6 +904,58 @@ to change the manifest (a new source path, a new coverage report entry) commits 
 of its **own** PR, validated by that PR's own already-working CI run (Section 4.0a's trigger already
 covers `story/**` → the epic branch) — adding a second scratch-PR cycle per story would double Actions
 minutes for a case the existing per-story flow already covers correctly.
+
+#### 4.0.7 🔴 TEST PLACEMENT CHECK — generate `check-test-placement.*` alongside `run-static-evals.*`
+
+**Purpose**: `common/directory-structure.md` rules 4a/4b and `implementation/code-generation.md` Step
+11a.6 (`SH-LOOP-12` in `workflows/dev-implement.md` Step 6.3) state where a test file must live. This
+gate is what actually **proves** it, mechanically, instead of relying on the generating run to remember
+correctly — exactly the same reasoning that makes D1–D7 deterministic checks rather than a model
+re-reading a lint rule.
+
+**Generate** `tests/.evals/scripts/check-test-placement.{sh,ps1}` (copied byte-for-byte from
+`templates/ci/`, same rule as every other script in this section — never hand-authored per repo) that:
+
+1. **Takes the diff base as its one argument**, same convention as `run-static-evals.*`: `git diff
+   --name-only --diff-filter=ACMR <base-sha>...HEAD`.
+2. **Classifies each changed path** as `application`, `unit-test`, `api-test`, or `other`:
+   - `unit-test` — matches the stack's unit-test naming convention (`*.test.*`, `*.spec.*`,
+     `test_*.py`, `*_test.py` outside Go, `*Test.java`, `*Tests.cs`, RTL/jsdom/Enzyme/Vue-Test-Utils
+     component suites), read from `tests/.evals/config.json`'s stack-detection block (Section 3) —
+     never hardcoded to one language.
+   - `api-test` — a `unit-test`-shaped file that additionally imports/uses a real-endpoint test client
+     (`supertest`, `httpx`/`TestClient`, `RestAssured`, `MockMvc`, or spins up a server) — grep the
+     file's own imports, since the naming convention alone does not distinguish it.
+   - `application` — everything under the resolved code root that is neither of the above.
+3. **Fails (non-zero exit, one line per violation) when**:
+   - an `application`-classified path is actually test-shaped (a test file was written under `src/`
+     or `## Code Root`) — **unless** the stack's own co-location convention applies (Go `_test.go`,
+     Rust `#[cfg(test)]`), which is never a violation;
+   - a `unit-test` path's parent is not under `tests/unit/` (e.g. `tests/components/`, `tests/foo/`,
+     or a bare file at `tests/`);
+   - an `api-test` path's parent is not under `tests/api/` (most commonly: found instead under
+     `tests/unit/`).
+4. **Emits** a JSON summary (`files_scanned`, `violations: [{path, classification, expected_root,
+   reason}]`, `verdict: PASS|FAIL`) to stdout, captured by the caller into
+   `reports/unit-test-evidence/story-[N.M]/test-placement-check.log` — same evidence contract as every
+   other gate in this document, never a hand-written claim.
+5. **Both the local run (`code-generation.md` Step 11a.6) and CI call the SAME script** — never a
+   second, YAML-inlined copy of the classification logic. Wire it into the generated
+   `agentic-eval-pipeline.yml` as its own step in Stage 1 (deterministic checks), immediately after the
+   D1–D7 steps and before Stage 2:
+   ```yaml
+   - name: "Test placement check"
+     run: tests/.evals/scripts/check-test-placement.sh "${{ steps.basesha.outputs.sha }}"
+   ```
+6. **Validation — new check V35** (added to the `validate-pipeline.{sh,ps1}` table in Section 4.0.1):
+   `check-test-placement.*` exists, is referenced in the generated YAML, and — same discipline as V9 —
+   is proven to FAIL against a deliberately misplaced fixture (a `.test.` file dropped under `src/`)
+   before being trusted to pass real diffs. A script that returns `PASS` unconditionally is the same
+   defect V9 already forbids for `run-static-evals`/`run-evals`.
+
+🔴 This check is **additional** to D1–D7, never folded into one of them and never a substitute for
+`run-static-evals.*` — a repo can lint-clean and type-clean while still writing a unit test under
+`src/`, and D1–D7's thresholds have nothing to say about file location.
 
 ### 4.0a 🔴 TRIGGER — every AIRE integration branch must be covered
 
@@ -2590,7 +2699,7 @@ and the entire exchange was spent on a class of failure that neither side owned 
 | Owns | **CI configuration and provisioning**: `tests/.evals/ci-manifest.d/<unit>.json`, the repo's own dependency declarations, `.github/workflows/**`, `tests/.evals/scripts/**`, `tests/.evals/config.json`, `tests/.evals/rubrics/**`, tool pins | **Application code and tests**: `src/**` (or the recorded `## Code Root`) and `tests/**` outside `tests/.evals/**` |
 | Triage classes it repairs | **Manifest** + the provisioning half of **Infrastructure** (a missing tool/dependency declaration is a declaration bug) | **Code** — every row in Section 6.4 marked *Repair* |
 | Never touches | Application source or tests, in response to a CI failure | `.github/workflows/**`, `tests/.evals/config.json`, `tests/.evals/rubrics/**`, `tests/.evals/ci-manifest.d/**`, `spec/**` — enforced, not merely instructed (**V33**) |
-| Budget | The workflow's own 3-attempt loop (`dev-implement` SH-LOOP-9 for preflight, and the CI Attestation Gate's own 3 attempts) | `retryLimitForSelfRepair`, default 3 |
+| Budget | The workflow's own 3-attempt loops (`dev-implement` SH-LOOP-9 for preflight, SH-LOOP-10 for the CI Attestation Gate — both governed by the SELF-HEALING RETRY POLICY: per-loop counter, SH-3 attempt logging, SH-4 exhaustion halt) | `retryLimitForSelfRepair`, default 3 |
 
 **Hand-off rules:**
 

@@ -1,0 +1,13 @@
+BASELINE REGRESSION — Story 1.1 (story/1.1-replace-inline-aws-credentials-storage-integration)
+Captured: 2026-09-14T12:05:00Z
+Base commit: c42c96cd0666523b5532254f2c9a61450c841d33 (epic branch, post STOP CHECKPOINT)
+
+No test suite exists yet in this repo (tests/unit/ and tests/behavior/ are both absent/empty; only
+tests/.evals/ scaffolding from the STOP CHECKPOINT exists). This is expected for a fresh AIRE cycle's
+first story — no prior story has yet added application tests.
+
+Per dev-implement.md Step 1.5 Item 4.5: "If the repo has no test suite at all, record that explicitly
+— the post-implementation gate then covers only this story's new tests."
+
+Baseline pass/fail counts: N/A (no suite to run)
+Baseline failing tests: none (no suite exists)

@@ -40,8 +40,26 @@ CROSS_STORY="spec/behavior.feature"
 run_features() { # $@ = feature files
   [ "$#" -gt 0 ] || { echo "run.sh: tier ${TIER} resolved zero feature files" >&2; return 2; }
   # >>> STACK-RESOLVED BEHAVIOUR RUNNER START <<<
-  echo "run.sh: no behaviour runner resolved for this stack — generation defect (ERROR, not a pass)" >&2
-  return 2
+  # Python stack (pyproject.toml) -> pytest-bdd, per common/behavior-spec.md Section 4.1.
+  # Each given feature file (spec/behavior/<key>.feature) is bound 1:1 to a pytest-bdd test module
+  # (tests/behavior/test_<key-with-dots-as-underscores>.py, via that module's own scenarios() call) —
+  # resolve each argument to its module and run ONLY those, so B1/B2 actually run disjoint subsets
+  # instead of the whole tree regardless of tier (a blind "pytest tests/behavior/" would make B1 and
+  # B2 indistinguishable, defeating the tiered gate).
+  local -a test_modules=()
+  local feat key module
+  for feat in "$@"; do
+    key="$(basename "$feat" .feature)"                  # story-1.1
+    module="tests/behavior/test_$(echo "$key" | tr '.-' '__').py"  # story-1.1 -> test_story_1_1.py
+    if [ -f "$module" ]; then
+      test_modules+=("$module")
+    else
+      echo "run.sh: no test module found for feature '${feat}' (looked for ${module})" >&2
+      return 2
+    fi
+  done
+  python3 -m pytest "${test_modules[@]}" -v --tb=short \
+    --junitxml="${AIRE_BEHAVIOR_REPORT:-tests/.evals/_run/behavior-test-report.xml}"
   # >>> STACK-RESOLVED BEHAVIOUR RUNNER END <<<
 }
 
@@ -98,9 +116,19 @@ case "$TIER" in
     fi
     run_features "$unit_feature" ;;
   b2)
-    mapfile -t others < <(ls -1 "${BEHAVIOR_DIR}"/*.feature 2>/dev/null || true)
+    # 🔴 B2 is every OTHER feature file — it MUST exclude this unit's own (AIRE_STORY_KEY), or B2
+    #    always includes B1's own scenarios (wrong: it would report N/A-worthy "no others" as a false
+    #    pass on the very first story, and double-count the current unit's file on every later one).
+    mapfile -t all_features < <(ls -1 "${BEHAVIOR_DIR}"/*.feature 2>/dev/null || true)
+    others=()
+    for f in "${all_features[@]}"; do
+      if [ -n "${AIRE_STORY_KEY:-}" ] && [ "$(basename "$f" .feature)" = "${AIRE_STORY_KEY}" ]; then
+        continue
+      fi
+      others+=("$f")
+    done
     if [ "${#others[@]}" -eq 0 ]; then
-      echo "run.sh: b2 N/A — no story has been dev-implement'd in this epic yet (spec/behavior/ has zero feature files)" >&2
+      echo "run.sh: b2 N/A — no OTHER story feature file exists yet (spec/behavior/ has only this unit's own contract, or none)" >&2
       exit 3
     fi
     run_features "${others[@]}" ;;

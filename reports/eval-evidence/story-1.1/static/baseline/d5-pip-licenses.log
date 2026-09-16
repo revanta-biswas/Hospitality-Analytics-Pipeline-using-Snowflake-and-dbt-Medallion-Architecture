@@ -1,0 +1,338 @@
+=== D5 pip-licenses ===
+[
+  {
+    "License": "Apache-2.0",
+    "Name": "CacheControl",
+    "Version": "0.14.4"
+  },
+  {
+    "License": "MIT",
+    "Name": "Mako",
+    "Version": "1.4.1"
+  },
+  {
+    "License": "BSD-3-Clause",
+    "Name": "MarkupSafe",
+    "Version": "3.0.3"
+  },
+  {
+    "License": "MIT License",
+    "Name": "PyYAML",
+    "Version": "6.0.3"
+  },
+  {
+    "License": "BSD-2-Clause",
+    "Name": "Pygments",
+    "Version": "2.21.0"
+  },
+  {
+    "License": "MIT",
+    "Name": "annotated-doc",
+    "Version": "0.0.5"
+  },
+  {
+    "License": "MIT",
+    "Name": "annotated-types",
+    "Version": "0.8.0"
+  },
+  {
+    "License": "MIT",
+    "Name": "anyio",
+    "Version": "4.15.0"
+  },
+  {
+    "License": "MIT",
+    "Name": "ast_serialize",
+    "Version": "0.9.0"
+  },
+  {
+    "License": "BSD-2-Clause",
+    "Name": "boolean.py",
+    "Version": "5.0"
+  },
+  {
+    "License": "Mozilla Public License 2.0 (MPL 2.0)",
+    "Name": "certifi",
+    "Version": "2026.7.22"
+  },
+  {
+    "License": "MIT",
+    "Name": "charset-normalizer",
+    "Version": "3.5.1"
+  },
+  {
+    "License": "BSD-3-Clause",
+    "Name": "click",
+    "Version": "8.5.0"
+  },
+  {
+    "License": "BSD License",
+    "Name": "colorama",
+    "Version": "0.4.6"
+  },
+  {
+    "License": "Apache Software License",
+    "Name": "cyclonedx-python-lib",
+    "Version": "11.12.0"
+  },
+  {
+    "License": "Python Software Foundation License",
+    "Name": "defusedxml",
+    "Version": "0.7.1"
+  },
+  {
+    "License": "MIT License",
+    "Name": "et_xmlfile",
+    "Version": "2.0.0"
+  },
+  {
+    "License": "MIT",
+    "Name": "fastapi",
+    "Version": "0.141.1"
+  },
+  {
+    "License": "MIT",
+    "Name": "filelock",
+    "Version": "3.32.5"
+  },
+  {
+    "License": "MIT",
+    "Name": "gherkin-official",
+    "Version": "29.0.0"
+  },
+  {
+    "License": "MIT License",
+    "Name": "h11",
+    "Version": "0.16.0"
+  },
+  {
+    "License": "MIT",
+    "Name": "httptools",
+    "Version": "0.8.0"
+  },
+  {
+    "License": "BSD-3-Clause",
+    "Name": "idna",
+    "Version": "3.19"
+  },
+  {
+    "License": "MIT",
+    "Name": "iniconfig",
+    "Version": "2.3.0"
+  },
+  {
+    "License": "MIT",
+    "Name": "librt",
+    "Version": "0.15.0"
+  },
+  {
+    "License": "Apache-2.0",
+    "Name": "license-expression",
+    "Version": "30.4.4"
+  },
+  {
+    "License": "MIT License",
+    "Name": "mando",
+    "Version": "0.7.1"
+  },
+  {
+    "License": "MIT License",
+    "Name": "markdown-it-py",
+    "Version": "4.2.0"
+  },
+  {
+    "License": "MIT License",
+    "Name": "mdurl",
+    "Version": "0.1.2"
+  },
+  {
+    "License": "Apache-2.0",
+    "Name": "msgpack",
+    "Version": "1.2.2"
+  },
+  {
+    "License": "MIT",
+    "Name": "mypy",
+    "Version": "2.3.1"
+  },
+  {
+    "License": "MIT",
+    "Name": "mypy_extensions",
+    "Version": "1.1.0"
+  },
+  {
+    "License": "MIT License",
+    "Name": "openpyxl",
+    "Version": "3.1.5"
+  },
+  {
+    "License": "MIT License",
+    "Name": "packageurl-python",
+    "Version": "0.17.6"
+  },
+  {
+    "License": "Apache-2.0 OR BSD-2-Clause",
+    "Name": "packaging",
+    "Version": "26.3"
+  },
+  {
+    "License": "MIT",
+    "Name": "parse",
+    "Version": "1.22.1"
+  },
+  {
+    "License": "MIT",
+    "Name": "parse_type",
+    "Version": "0.6.6"
+  },
+  {
+    "License": "Mozilla Public License 2.0 (MPL 2.0)",
+    "Name": "pathspec",
+    "Version": "1.1.1"
+  },
+  {
+    "License": "Apache Software License",
+    "Name": "pip-api",
+    "Version": "0.0.34"
+  },
+  {
+    "License": "MIT",
+    "Name": "pip-requirements-parser",
+    "Version": "32.0.1"
+  },
+  {
+    "License": "Apache Software License",
+    "Name": "pip_audit",
+    "Version": "2.10.1"
+  },
+  {
+    "License": "MIT",
+    "Name": "platformdirs",
+    "Version": "4.11.7"
+  },
+  {
+    "License": "MIT License",
+    "Name": "pluggy",
+    "Version": "1.6.0"
+  },
+  {
+    "License": "Apache Software License",
+    "Name": "py-serializable",
+    "Version": "2.1.0"
+  },
+  {
+    "License": "MIT",
+    "Name": "pydantic",
+    "Version": "2.13.5"
+  },
+  {
+    "License": "MIT",
+    "Name": "pydantic_core",
+    "Version": "2.46.5"
+  },
+  {
+    "License": "MIT",
+    "Name": "pyparsing",
+    "Version": "3.3.2"
+  },
+  {
+    "License": "MIT",
+    "Name": "pytest",
+    "Version": "9.1.1"
+  },
+  {
+    "License": "MIT License",
+    "Name": "pytest-bdd",
+    "Version": "8.1.0"
+  },
+  {
+    "License": "BSD-3-Clause",
+    "Name": "python-dotenv",
+    "Version": "1.2.3"
+  },
+  {
+    "License": "Apache-2.0",
+    "Name": "python-multipart",
+    "Version": "0.0.32"
+  },
+  {
+    "License": "MIT License",
+    "Name": "radon",
+    "Version": "6.0.1"
+  },
+  {
+    "License": "Apache Software License",
+    "Name": "requests",
+    "Version": "2.34.2"
+  },
+  {
+    "License": "MIT License",
+    "Name": "rich",
+    "Version": "15.0.0"
+  },
+  {
+    "License": "MIT",
+    "Name": "ruff",
+    "Version": "0.16.5"
+  },
+  {
+    "License": "MIT License",
+    "Name": "six",
+    "Version": "1.17.0"
+  },
+  {
+    "License": "Apache Software License",
+    "Name": "sortedcontainers",
+    "Version": "2.4.0"
+  },
+  {
+    "License": "BSD-3-Clause",
+    "Name": "starlette",
+    "Version": "1.6.0"
+  },
+  {
+    "License": "MIT",
+    "Name": "tomli",
+    "Version": "2.4.1"
+  },
+  {
+    "License": "MIT License",
+    "Name": "tomli_w",
+    "Version": "1.2.0"
+  },
+  {
+    "License": "MIT",
+    "Name": "typing-inspection",
+    "Version": "0.4.4"
+  },
+  {
+    "License": "PSF-2.0",
+    "Name": "typing_extensions",
+    "Version": "4.16.0"
+  },
+  {
+    "License": "MIT",
+    "Name": "urllib3",
+    "Version": "2.7.0"
+  },
+  {
+    "License": "BSD-3-Clause",
+    "Name": "uvicorn",
+    "Version": "0.52.4"
+  },
+  {
+    "License": "Apache Software License; MIT License",
+    "Name": "uvloop",
+    "Version": "0.22.1"
+  },
+  {
+    "License": "MIT License",
+    "Name": "watchfiles",
+    "Version": "1.2.0"
+  },
+  {
+    "License": "BSD-3-Clause",
+    "Name": "websockets",
+    "Version": "17.1"
+  }
+]

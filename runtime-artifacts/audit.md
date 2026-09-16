@@ -858,3 +858,34 @@ In Development until PR #12 is manually merged and ve signs it off via ve-list-w
 **Context**: dev-implement Section D/E (PR raise + auto review)
 
 ---
+
+**Timestamp**: 2026-09-16T10:50:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.2 - PR #12 merge conflict resolved
+**TRACKER ITEM**: "[Story 1.2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "PR #11 merged into the epic branch while PR #12 was open, and both branches had
+independently reapplied the same 4 behavior-gate infra fixes (predicted risk, flagged in the PR #12
+review). Merged origin/epic/harden-pipeline-security-and-data-quality into
+story/1.2-externalize-dbt-secrets-env-vars and resolved 6 conflicts:
+1. pyproject.toml / Containerfile - kept pyyaml (needed by Story 1.2's YAML-parsing step defs; not
+   needed by Story 1.1) alongside the shared base deps.
+2. tests/behavior/conftest.py - combined both stories' step-file imports (stage_credential_steps +
+   profile_secrets_steps) using the sys.path-based loader pattern from #11's merged version.
+3. tests/.evals/behavior/run.sh - two purely cosmetic conflicts (story-1.1 vs story-1.2 in example
+   comments); resolved to story-agnostic/either wording, logic was identical on both sides.
+4. runtime-artifacts/aire-state.md - kept Story 1.2's more current tracker row (PR #12, In
+   Development); separately corrected Story 1.1's row to reflect its actual merge state
+   (Merged: yes, PR #11 link) - status stays In Development per AIRE rules until ve-list-work signs
+   it off, only Merged/End reflect the real merge.
+5. runtime-artifacts/audit.md - append-only log, combined both sides (no entries were actually lost,
+   the incoming side was empty at the conflict point).
+6. src/snowflake/{Stage,Copy_Into}.sql - Story 1.1's actual credential-hardening changes, applied
+   cleanly via the merge (no conflict, auto-merged).
+Verified the merge is functionally sound: rebuilt aire-behavior:local and ran all 4 tier
+combinations (1.1 B1/B2, 1.2 B1/B2) - all pass with correct scenario counts (1.1: 4 own + sees 1.2's
+5 as B2; 1.2: 5 own + sees 1.1's 4 as B2). Committed the merge (4a304f7)."
+**Context**: PR #12 conflict resolution, dev-implement branch hygiene
+
+---

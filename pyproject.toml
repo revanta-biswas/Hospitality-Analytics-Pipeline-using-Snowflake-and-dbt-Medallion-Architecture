@@ -14,4 +14,5 @@ dev = [
     "pytest>=8.0.0",
     "pytest-bdd>=8.0.0",
     "sqlparse>=0.5.0",
+    "pyyaml>=6.0",
 ]

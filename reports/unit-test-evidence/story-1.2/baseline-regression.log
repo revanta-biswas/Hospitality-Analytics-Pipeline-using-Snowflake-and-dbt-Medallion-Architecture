@@ -1,0 +1,10 @@
+BASELINE REGRESSION — Story 1.2 (story/1.2-externalize-dbt-secrets-env-vars)
+Captured: 2026-09-15T10:40:00Z
+Base commit: epic/harden-pipeline-security-and-data-quality @ 36dd05f (post framework sync)
+
+No test suite exists yet on this branch (tests/unit/ and tests/behavior/ are both absent/empty).
+Story 1.1's own tests exist only on its own unmerged story branch/PR #11 — they have not yet landed
+on the epic branch, so they are not present here.
+
+Baseline pass/fail counts: N/A (no suite to run)
+Baseline failing tests: none (no suite exists)

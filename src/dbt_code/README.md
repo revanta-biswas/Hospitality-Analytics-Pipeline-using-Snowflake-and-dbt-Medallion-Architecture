@@ -1,5 +1,16 @@
 Welcome to your new dbt project!
 
+### Required environment variables
+
+`profiles.yml` reads the following connection secrets from the environment (never commit real
+values for these):
+
+- `DBT_SNOWFLAKE_ACCOUNT`
+- `DBT_SNOWFLAKE_USER`
+- `DBT_SNOWFLAKE_PASSWORD`
+- `DBT_SNOWFLAKE_ROLE`
+- `DBT_SNOWFLAKE_WAREHOUSE`
+
 ### Using the starter project
 
 Try running the following commands:

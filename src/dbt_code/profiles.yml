@@ -1,14 +1,14 @@
 dbt_code:
   outputs:
     dev:
-      account: YOUR ACCOUNT IDENTIFIER
+      account: "{{ env_var('DBT_SNOWFLAKE_ACCOUNT') }}"
       database: YOUR DATABASE
-      password: YOUR PASSWORD
-      role: YOUR ROLE
+      password: "{{ env_var('DBT_SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('DBT_SNOWFLAKE_ROLE') }}"
       schema: YOUR SCHEMA
       threads: 1
       type: snowflake
-      user: USER NAME
-      warehouse: WAREHOUSE NAME
+      user: "{{ env_var('DBT_SNOWFLAKE_USER') }}"
+      warehouse: "{{ env_var('DBT_SNOWFLAKE_WAREHOUSE') }}"
   target: dev
 

@@ -1,0 +1,50 @@
+{
+  "key": "story-1.2",
+  "rubricVersion": "1.0.0",
+  "judgeModel": "claude-sonnet-5",
+  "scoredAt": "2026-09-16T10:15:00Z",
+  "criteria": [
+    {
+      "id": "ARCH-01",
+      "metric": "No plaintext or hard-coded credentials",
+      "weight": 0.30,
+      "score": 1.0,
+      "citation": "src/dbt_code/profiles.yml — account/user/password/role/warehouse all converted to {{ env_var(...) }} references per REQ-F-02. Independently re-verified via grep.",
+      "applicable": true
+    },
+    {
+      "id": "ARCH-02",
+      "metric": "dbt dependencies resolved via ref()/source()",
+      "weight": 0.20,
+      "score": null,
+      "applicable": false,
+      "reason": "No .sql model in src/dbt_code/models/ touched by this diff"
+    },
+    {
+      "id": "ARCH-03",
+      "metric": "No behavioral/schema change to Gold outputs",
+      "weight": 0.20,
+      "score": null,
+      "applicable": false,
+      "reason": "fact.sql/obt.sql/snapshots not touched by this diff"
+    },
+    {
+      "id": "ARCH-04",
+      "metric": "New dbt tests statically valid",
+      "weight": 0.15,
+      "score": null,
+      "applicable": false,
+      "reason": "No dbt schema test added by this story"
+    },
+    {
+      "id": "ARCH-05",
+      "metric": "CI workflow requires no secret/paid service",
+      "weight": 0.15,
+      "score": null,
+      "applicable": false,
+      "reason": "No CI workflow file touched by this story"
+    }
+  ],
+  "renormalizedWeightedScore": 1.0,
+  "note": "Only ARCH-01 is applicable to this diff; renormalized to weight 1.0, per eval-framework.md Section 4.1 rule 5."
+}

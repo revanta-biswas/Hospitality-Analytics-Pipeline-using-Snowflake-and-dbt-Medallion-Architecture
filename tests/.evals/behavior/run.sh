@@ -49,8 +49,8 @@ run_features() { # $@ = feature files
   local -a test_modules=()
   local feat key module
   for feat in "$@"; do
-    key="$(basename "$feat" .feature)"                  # story-1.1
-    module="tests/behavior/test_$(echo "$key" | tr '.-' '__').py"  # story-1.1 -> test_story_1_1.py
+    key="$(basename "$feat" .feature)"                  # e.g. story-1.2
+    module="tests/behavior/test_$(echo "$key" | tr '.-' '__').py"  # story-1.2 -> test_story_1_2.py
     if [ -f "$module" ]; then
       test_modules+=("$module")
     else

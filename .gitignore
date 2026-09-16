@@ -15,6 +15,11 @@ env/
 
 # 🔹 Logs
 *.log
+# 🔴 AIRE evidence logs (baseline-regression.log, full-regression.log, behavior-test-run.log, per-gate
+#    D1-D7 .log files) are real, tracked evidence artifacts required by common/eval-framework.md
+#    Section 6 and common/behavior-spec.md Section 6.2 — not generated app/runtime logs. The blanket
+#    *.log rule above would otherwise silently drop them (same class of gap as the *.json fix below).
+!reports/**/*.log
 
 # 🔹 OS files
 .DS_Store

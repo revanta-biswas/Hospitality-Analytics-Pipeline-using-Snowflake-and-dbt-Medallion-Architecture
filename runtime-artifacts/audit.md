@@ -703,3 +703,189 @@ written to reports/reviews/story-1.1-code-review-v1.md."
 **Context**: dev-implement Section B routing
 
 ---
+
+**Timestamp**: 2026-09-15T09:55:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.1 - PR raised via pr-generator (workflow mode)
+**TRACKER ITEM**: "[Story 1.1](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Invoked pr-generator in workflow mode (no confirmation, per dev-implement Section D
+authorization). Pushed story/1.1-replace-inline-aws-credentials-storage-integration, created PR #11
+targeting epic/harden-pipeline-security-and-data-quality, title '[STORY][#1] Replace inline AWS
+credentials with a Snowflake Storage Integration', labels ai-generated + aire-v1.0 (both already
+existed by exact name). Phase 7 archive auto-trigger checklist: FAIL on all 3 substantive conditions
+(invocation is from a workflow not standalone; current branch is the story branch not the epic branch;
+PR target is the epic branch not the base branch) - correctly NOT triggering archive-epic, since this
+is a story-to-epic PR, not the epic-cycle-close PR. Story 1.1 remains 🔵 In Development (PR raised,
+not merged) - stays that way until PR #11 merges and ve signs it off via ve-list-work."
+**Context**: dev-implement Section D (commit/push/PR)
+
+---
+
+**Timestamp**: 2026-09-15T10:00:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.1 - Automated PR Review posted (AUTO MODE)
+**TRACKER ITEM**: "[Story 1.1](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/1)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Auto-invoked pr-review skill in AUTO MODE against PR #11 - posted a plain COMMENT
+review (verdict Approve, 0 blockers, 0 issues, 1 nit, 3 items flagged for human review: the
+out-of-band IAM trust-policy step, the .gitignore blanket negation scope, and a maintainer read-through
+of the shared behavior-gate infrastructure). No formal approve/request-changes (same identity that
+raised the PR - GitHub rejects a formal self-review anyway). Verified posted via gh pr view --json
+reviews. Story 1.1 development work is now complete for this session: story stays 🔵 In Development
+until PR #11 is manually merged by the user, then ve signs it off via ve-list-work to promote it to
+🧪 Ready for Testing."
+**Context**: dev-implement Section E (auto PR review)
+
+---
+
+## Story Selection — Story 1.2
+**Timestamp**: 2026-09-15T10:10:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "1.2 - env_var() secrets (Recommended)"
+**TRACKER ITEM**: "[Story 1.2: Externalize dbt connection secrets via environment variables](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Epic Link**: "[Epic: Harden Pipeline (Security & Data Quality)](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Resolved Story 1.2 (issue #2) matching stories.md. Doability Gate: requires=[] per dependency-graph.yml - doable immediately. Transitioned GitHub label status:ready-for-dev -> status:in-development, assigned to revanta-biswas, posted claim comment. Verified via gh issue view. Story Tracker updated: Status -> In Development, Start=2026-09-15."
+**Context**: Story Selection + Doability Gate, dev-implement Step 2/3
+
+---
+
+**Timestamp**: 2026-09-15T10:30:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.2 - Branch corrected, framework synced, baseline capture starting
+**TRACKER ITEM**: "[Story 1.2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Corrected an earlier mistake where story/1.2-... was accidentally cut from
+story/1.1-...'s HEAD instead of the epic branch (git checkout to the epic branch failed silently due
+to uncommitted changes, then the branch-creation command still ran against the wrong HEAD). Deleted
+and recut correctly from epic/harden-pipeline-security-and-data-quality (merge-base now matches
+exactly). Per user request, also synced this branch with the user's own AIRE framework file updates:
+merged main (containing the user's commit eda932d) into the epic branch (resolved 21 add/add conflicts
+by taking main's updated versions - the epic branch's original copies were superseded), pushed, then
+merged the updated epic branch into this story branch (clean, no conflicts). Proceeding to baseline
+capture and code generation for Story 1.2 (env_var() secrets in profiles.yml)."
+**Context**: dev-implement Step 1.5 (branch correction + sync)
+
+---
+
+**Timestamp**: 2026-09-15T10:35:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.2 - Framework update review; noted infrastructure gap (non-blocking)
+**TRACKER ITEM**: "[Story 1.2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Reviewed the diff the framework update introduced to dev-implement.md/directory-structure.md/
+ci-pipeline-generation.md before continuing Story 1.2. New gates: SH-LOOP-12 Test Placement
+Verification (Step 6.3), SH-LOOP-11 Playwright UI Automation (Step 6.7 part 2, UI stories only),
+mandatory ve-implement invocation every story (Step 6.7 part 1), SH-LOOP-10 CI Attestation (Section D
+Step 8). Checked aire-workflow/templates/ci/ for the check-test-placement.{sh,ps1} template the new
+Section 4.0.7 rule references - it does not exist yet (documentation-only sync; the canonical script
+template itself wasn't included). NOTED, not blocking: Story 1.2 has zero test files (pure YAML +
+markdown docs change), so the Test Placement Verification Gate is legitimately N/A per its own rule
+('N/A only when this story changed no test files at all') regardless of the missing script. Proceeding
+with Story 1.2; will invoke ve-implement per the new mandatory Step 6.7 part 1. Playwright (Step 6.7
+part 2) is N/A - no Frontend Components Generation step in this story's plan."
+**Context**: dev-implement Code Generation, framework-update reconciliation
+
+---
+
+## Test Plan (ve-implement skill)
+**Timestamp**: 2026-09-16T10:04:43Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "Story 1.2 (mode: workflow - invoked automatically from dev-implement per the mandatory Step 6.7 part 1)"
+**Story**: "1.2 - Externalize dbt connection secrets via environment variables - [#2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Output folder**: `spec/test-plans/2-externalize-dbt-secrets-env-vars/`
+**ve branch / PR**: "N/A - workflow mode skips the ve/... branch and PR entirely (Step 3, Step 5 both skipped per Mode Detection); artifacts ride this story's own commit on story/1.2-externalize-dbt-secrets-env-vars"
+**Test plans generated**: "Security (5 cases: TC-SEC-01..05) - N/A plans: Integration (no service boundary), E2E (no user-visible workflow), API (no endpoint), Contract (no consumer/provider schema), Performance (no latency/throughput target), Accessibility (no UI)"
+**Coverage**: "5/5 acceptance criteria covered"
+**Approve / Request Changes checkpoint**: "Approved (automatic - workflow mode, no ve review)"
+**AI Response**: "Generated black-box security test plan for Story 1.2, derived solely from stories.md ACs and requirements.md REQ-F-02/REQ-NF-01/REQ-NF-02 text - no application source code was read. 5 test cases covering literal-secret absence, non-secret fields staying literal, README documentation, a negative case (missing env var fails safely), and YAML validity. All 5 ACs traced to >=1 test case."
+**Context**: `/ve-implement` skill - Test Plan (`test-plan.md`), invoked in WORKFLOW MODE by dev-implement Step 6.7 part 1
+
+---
+
+**Timestamp**: 2026-09-16T10:20:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.2 - Automated Code Review complete
+**TRACKER ITEM**: "[Story 1.2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Ran Code Review (INITIAL_REVIEW) scoped to Story 1.2. Phase 2: all 5 ACs Met with
+file:line evidence, independently re-verified. Phase 2.5 Security Baseline (diff-scoped): 1/16 rules
+applicable (SECURITY-12 no-hardcoded-credentials - compliant) - report at
+reports/code-security-reviews/security-review-2026-09-16.md, verdict PASS, 0 findings. Phase 3.5
+Judge Gates: J1=1.0 (only ARCH-01 applicable), J2=1.0 (SEC-01+SEC-04 applicable) - both above 0.85
+threshold. Report at reports/reviews/story-1.2-code-review-v1.md. Verdict APPROVED, 0 findings -
+routing straight to commit/push/PR (Section D), no Remediate loop needed."
+**Context**: dev-implement Section A/B (Auto Code Review + Verdict Routing)
+
+---
+
+**Timestamp**: 2026-09-16T10:25:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.2 - Housekeeping: found and fixed another .gitignore evidence-dropping gap
+**TRACKER ITEM**: "[Story 1.2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Before committing, git status showed several mandatory evidence .log files
+(behavior-test-run.log, baseline-regression.log, full-regression.log) as untracked/absent from the
+staged diff despite being written to disk. Found the same class of defect as the earlier *.json gap:
+the blanket `*.log` rule in .gitignore was silently dropping all evidence logs required by
+eval-framework.md Section 6 / behavior-spec.md Section 6.2. Fixed by adding `!reports/**/*.log`,
+matching the existing `!reports/**/*.json` pattern. Re-staged - all 3 log files now tracked."
+**Context**: Housekeeping, dev-implement Section D (commit preparation)
+
+---
+
+**Timestamp**: 2026-09-16T10:35:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.2 - PR raised and auto-reviewed; story development complete for this session
+**TRACKER ITEM**: "[Story 1.2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "Pushed story/1.2-externalize-dbt-secrets-env-vars, created PR #12 into
+epic/harden-pipeline-security-and-data-quality, labels ai-generated + aire-v1.0. Phase 7 archive
+check: FAIL on all substantive conditions (story->epic PR, not epic->base) - correctly did not
+trigger archive-epic. Recorded PR #12 in Story Tracker. Auto-invoked pr-review (AUTO MODE) - posted
+plain COMMENT review, verdict Approve, 0 blockers, 0 issues, 1 nit, 3 items flagged for human review
+(duplicate infra-fix commits across #11/#12 pending merge-order reconciliation, an unexecutable
+negative test case in ve's black-box plan, the .gitignore log-negation scope). Story 1.2 stays
+In Development until PR #12 is manually merged and ve signs it off via ve-list-work."
+**Context**: dev-implement Section D/E (PR raise + auto review)
+
+---
+
+**Timestamp**: 2026-09-16T10:50:00Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**Event**: Story 1.2 - PR #12 merge conflict resolved
+**TRACKER ITEM**: "[Story 1.2](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/issues/2)"
+**Epic Link**: "[Epic: Harden Pipeline](https://github.com/revanta-biswas/Hospitality-Analytics-Pipeline-using-Snowflake-and-dbt-Medallion-Architecture/milestone/1)"
+**AIRE VERSION**: "1.0"
+**AI Response**: "PR #11 merged into the epic branch while PR #12 was open, and both branches had
+independently reapplied the same 4 behavior-gate infra fixes (predicted risk, flagged in the PR #12
+review). Merged origin/epic/harden-pipeline-security-and-data-quality into
+story/1.2-externalize-dbt-secrets-env-vars and resolved 6 conflicts:
+1. pyproject.toml / Containerfile - kept pyyaml (needed by Story 1.2's YAML-parsing step defs; not
+   needed by Story 1.1) alongside the shared base deps.
+2. tests/behavior/conftest.py - combined both stories' step-file imports (stage_credential_steps +
+   profile_secrets_steps) using the sys.path-based loader pattern from #11's merged version.
+3. tests/.evals/behavior/run.sh - two purely cosmetic conflicts (story-1.1 vs story-1.2 in example
+   comments); resolved to story-agnostic/either wording, logic was identical on both sides.
+4. runtime-artifacts/aire-state.md - kept Story 1.2's more current tracker row (PR #12, In
+   Development); separately corrected Story 1.1's row to reflect its actual merge state
+   (Merged: yes, PR #11 link) - status stays In Development per AIRE rules until ve-list-work signs
+   it off, only Merged/End reflect the real merge.
+5. runtime-artifacts/audit.md - append-only log, combined both sides (no entries were actually lost,
+   the incoming side was empty at the conflict point).
+6. src/snowflake/{Stage,Copy_Into}.sql - Story 1.1's actual credential-hardening changes, applied
+   cleanly via the merge (no conflict, auto-merged).
+Verified the merge is functionally sound: rebuilt aire-behavior:local and ran all 4 tier
+combinations (1.1 B1/B2, 1.2 B1/B2) - all pass with correct scenario counts (1.1: 4 own + sees 1.2's
+5 as B2; 1.2: 5 own + sees 1.1's 4 as B2). Committed the merge (4a304f7)."
+**Context**: PR #12 conflict resolution, dev-implement branch hygiene
+
+---

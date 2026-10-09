@@ -1,0 +1,23 @@
+version: 1
+generated_at: 2026-10-09
+team_size: 2
+
+shared_files:
+  - dbt_code/models/gold/agg_monthly_revenue.sql   # created by 1.1, extended by 1.2, tested by 1.3
+
+stories:
+  - id: "1.1"
+    title: Monthly revenue by city model
+    tracker_id: LOCAL
+    requires: []
+    enables: ["1.2"]
+  - id: "1.2"
+    title: Month-over-month revenue growth columns
+    tracker_id: LOCAL
+    requires: ["1.1"]
+    enables: ["1.3"]
+  - id: "1.3"
+    title: Data quality tests for agg_monthly_revenue
+    tracker_id: LOCAL
+    requires: ["1.2"]
+    enables: []

@@ -198,3 +198,81 @@
 **Context**: PLANNING - Dependency Graph Steps 3-8
 
 ---
+
+## Dependency Graph - Epic Branch Commit & Push
+**Timestamp**: 2026-10-09T09:59:17Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "(none - automatic)"
+**AI Response**: "Committed a8091fc on epic/monthly-revenue-aggregation (stories, personas, dependency graph, story-generation plan, state, audit; AIRE-Version: 1.0). Pushed to origin. No PR raised."
+**Context**: PLANNING - Dependency Graph Step 9
+
+---
+
+## Workflow Planning - Plan Announced (auto, no gate)
+**Timestamp**: 2026-10-09T09:59:44Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "(none - automatic)"
+**AI Response**: "Wrote spec/plans/executions.md. Application Design, Functional Design, NFR Requirements, NFR Design and Infrastructure Design all SKIPPED with rationale. Risk Low. Post-design coverage re-verification (Rule 4): 11/11 REQ-IDs, no reconciliation needed. Reached the STOP CHECKPOINT; asking the CI/CD opt-in (Step 1.2)."
+**Context**: PLANNING - Workflow Planning; IMPLEMENTATION - transition to STOP CHECKPOINT Steps 1, 1.2
+
+---
+
+## STOP CHECKPOINT - CI/CD Opt-In Prompt
+**Timestamp**: 2026-10-09T09:59:44Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "(prompt issued, awaiting answer)"
+**AI Response**: "Asked: Set up the CI/CD eval pipeline for this project? (yes/no). No .github/workflows/agentic-eval-pipeline.yml exists."
+**Context**: IMPLEMENTATION - STOP CHECKPOINT Step 1.2
+
+---
+
+## STOP CHECKPOINT - CI/CD Opt-In Answer
+**Timestamp**: 2026-10-09T10:00:22Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "no"
+**AI Response**: "Recorded CI/CD Enabled: No (user opt-out). Skipping Steps 1.6 and 4 (no CI pipeline, no smoke test). Continuing with Steps 1.3, 1.4, 1.5, 1.7."
+**Context**: IMPLEMENTATION - STOP CHECKPOINT Step 1.2
+
+---
+
+## STOP CHECKPOINT - behavior.feature, architecture.md, rubrics, behaviour specs
+**Timestamp**: 2026-10-09T10:01:57Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "(none - automatic)"
+**AI Response**: "Wrote spec/behavior.feature, spec/plans/architecture.md v1.0.0 (Section 10: 5 constraints, weights sum 1.0; Mermaid diagrams for context, components and ER), tests/.evals rubrics (architecture 5 criteria, security 3 OWASP criteria: A04, A05, A03) and config.json (created; ci.manifestState unresolved, roots empty by design since CI is off and no coverage-producing runner exists), and spec/behavior/story-1.[1-3].feature. Playwright recorded N/A (no UI). Steps 1.6 and 4 skipped (CI/CD No)."
+**Context**: IMPLEMENTATION - STOP CHECKPOINT Steps 1.3, 1.4, 1.5, 1.7 Part A
+
+---
+
+## Test Plan (ve-implement skill)
+**Timestamp**: 2026-10-09T10:03:13Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "(skill invoked by the STOP CHECKPOINT specs & test-plans stage for Stories 1.1, 1.2, 1.3)"
+**Story**: "1.1 Monthly revenue by city model; 1.2 Month-over-month revenue growth columns; 1.3 Data quality tests for agg_monthly_revenue (local-only stories, Tracker ID LOCAL)"
+**Output folder**: "spec/test-plans/story-1.1-monthly-revenue-by-city-model/, story-1.2-month-over-month-revenue-growth-columns/, story-1.3-data-quality-tests-for-agg-monthly-revenue/ (LOCAL stories use the story ID in place of a ticket ID)"
+**Verification Engineer branch / PR**: "none — workflow mode, files written on epic/monthly-revenue-aggregation and carried by the caller's commit"
+**Test plans generated**: "1.1: Integration 7, Security 2; 1.2: Integration 6; 1.3: Integration 5 (20 manual test cases) — N/A plans: API, Contract, E2E, Performance, Accessibility (data pipeline, no endpoints/UI/targets)"
+**Coverage**: "15/15 acceptance criteria covered by test cases"
+**Approve / Request Changes checkpoint**: "Approved (automatic — workflow mode, no Verification Engineer review)"
+**AI Response**: "Generated manual test plans and summaries with System Under Test blocks. Open question: Snowflake sandbox and seeding method (TO CONFIRM)."
+**Context**: /ve-implement skill — Test Plan (test-plan.md), Mode: workflow (invoked by the STOP CHECKPOINT specs & test-plans stage) — no Verification Engineer approval, no Verification Engineer branch, no Verification Engineer PR
+
+---
+
+## STOP CHECKPOINT - Coverage Check and Approval Prompt (Behaviour Specs & Test Plans)
+**Timestamp**: 2026-10-09T10:03:13Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "(none - automatic)"
+**AI Response**: "Blocking coverage check passed: 15/15 ACs have at least one @AC scenario (24 scenarios in 3 .feature files) and at least one test case (20 cases). Every work unit has a .feature file and a test-plan folder. Presented the 2-option completion message; awaiting Request Changes / Continue to Next Stage."
+**Context**: IMPLEMENTATION - STOP CHECKPOINT Step 1.7 (Section 4.1, Section 4)
+
+---
+
+## STOP CHECKPOINT - Behaviour Specs & Test Plans Approval
+**Timestamp**: 2026-10-09T10:16:08Z
+**User Email**: revanta.biswas@3pillarglobal.com
+**User Input**: "Continue to Next Stage"
+**AI Response**: "Approved. Marked state 'Design complete - awaiting dev-implement'. Committing design artifacts on the epic branch and pushing. Step 4 smoke test skipped (CI/CD No). Loading development-handoff.md."
+**Context**: IMPLEMENTATION - STOP CHECKPOINT Steps 1.7 approval, 2, 3
+
+---

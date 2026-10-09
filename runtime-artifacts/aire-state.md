@@ -92,3 +92,33 @@ graph TD
 - **Immediately startable**: 1.1
 - **Blocked**: 1.2 (needs 1.1), 1.3 (needs 1.2)
 - **Parallelism note**: the team_size target of 2 independent stories cannot be met; all three stories build on one model file.
+
+- [x] Dependency Graph
+- [x] Workflow Planning (spec/plans/executions.md)
+- [x] Application Design - SKIPPED (no new components)
+### IMPLEMENTATION PHASE
+- [x] Functional Design - SKIPPED
+- [x] NFR Requirements - SKIPPED
+- [x] NFR Design - SKIPPED
+- [x] Infrastructure Design - SKIPPED
+Requirements coverage verified post-design: 11/11 REQ-IDs - 2026-10-09T09:59:44Z (all design stages skipped; coverage matrix in stories.md unchanged)
+
+## CI/CD Configuration
+- Enabled: No
+- Source: user opt-out
+- Recorded: 2026-10-09T10:00:22Z
+
+## Design Artifacts (STOP CHECKPOINT)
+- spec/behavior.feature written (1 cross-unit journey, 2 scenarios) - 2026-10-09T10:01:57Z
+- spec/plans/architecture.md v1.0.0 written (5 verifiable constraints, weights 1.0) - 2026-10-09T10:01:57Z
+- tests/.evals/rubrics/architecture-rubric.json v1.0.0 (5 criteria), security-rubric.json v1.0.0 (3 criteria), tests/.evals/config.json created
+- spec/behavior/story-1.1.feature, story-1.2.feature, story-1.3.feature written
+
+## Behaviour Specs & Test Plans
+- **Work units covered**: 3
+- **Behaviour contracts**: spec/behavior/ — 3 file(s), 24 scenarios
+- **Manual test plans**: spec/test-plans/ — 3 folder(s), 20 test cases
+- **AC coverage**: 15/15 (scenarios) · 15/15 (test cases)
+- **Approved**: 2026-10-09T10:16:08Z
+
+Design complete — awaiting dev-implement
